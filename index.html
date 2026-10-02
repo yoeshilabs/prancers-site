@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prancers — cats that walk on the beat</title>
+<meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ---- the room: plum-black walls, ꜩ wallpaper, one hot-pink neon ---- */
+  :root {
+    --bg: #0e0a14; --wall: #150f1e; --panel: #1b1426; --line: #2e2440;
+    --ink: #f6effa; --mute: #b8accb; --dim: #8a7f9c;
+    --neon: #ff5fa2; --neon-soft: rgba(255, 95, 162, .55); --gold: #ffc85f;
+    --display: "League Gothic", "Oswald", "Arial Narrow", sans-serif;
+    --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); font: 17px/1.6 var(--body);
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='150' viewBox='0 0 120 150'%3E%3Cpath d='M18 14L34 8V64Q34 78 48 78Q56 78 60 72M8 28H90L56 62Q94 66 94 94Q94 120 66 120Q46 120 42 108M44 99a7 7 0 1 0 .1 0' transform='translate(35 40) scale(.5)' fill='none' stroke='%23ffffff' stroke-opacity='.025' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  a { color: inherit; }
+  .wrap { width: min(1160px, 100% - 32px); margin: 0 auto; }
+  .mono { font-family: var(--mono); }
+  .kicker { font: 700 13px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--neon); }
+  h1, h2 { font-family: var(--display); font-weight: 400; letter-spacing: .01em; line-height: .9; margin: 0; }
+  h2 { font-size: clamp(48px, 7vw, 84px); }
+  p { margin: 0 0 1em; }
+  .neon { text-shadow: 0 0 6px var(--neon-soft), 0 0 22px rgba(255, 95, 162, .35); }
+
+  /* ---- nav ---- */
+  nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(10px); background: rgba(14, 10, 20, .72); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; gap: 20px; height: 60px; }
+  nav .brand { font: 34px/1 var(--display); letter-spacing: .03em; text-decoration: none; }
+  nav .links { display: flex; gap: 18px; margin-left: auto; font: 13px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+  nav .links a { color: var(--mute); text-decoration: none; }
+  nav .links a:hover { color: var(--ink); }
+  nav .links a.btn { color: #1a0610; }
+  @media (max-width: 720px) { nav .links a:not(.btn) { display: none; } }
+
+  /* ---- buttons: neon tubes ---- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 20px; border-radius: 999px;
+    font: 700 14px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+    color: #1a0610; background: var(--neon); border: 0; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15) inset, 0 0 22px rgba(255, 95, 162, .45); transition: transform .15s, box-shadow .15s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255, 255, 255, .25) inset, 0 0 32px rgba(255, 95, 162, .7); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--neon); box-shadow: 0 0 14px rgba(255, 95, 162, .25), inset 0 0 10px rgba(255, 95, 162, .12); }
+  .btn:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  nav .btn { min-height: 38px; padding: 8px 16px; font-size: 12px; }
+
+  /* ---- hero: a live cat in its room ---- */
+  .hero { padding: 48px 0 36px; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 44px; align-items: center; }
+  @media (max-width: 880px) { .hero .wrap { grid-template-columns: 1fr; gap: 28px; } }
+  .stage { position: relative; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: #000;
+    box-shadow: 0 0 0 1px var(--line), 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .12); }
+  .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .stage .tag { position: absolute; left: 14px; top: 14px; padding: 6px 12px; border-radius: 999px; background: rgba(14, 10, 20, .7);
+    font: 12px var(--mono); color: var(--mute); pointer-events: none; }
+  .hero h1 { font-size: clamp(96px, 15vw, 188px); }
+  .hero .lede { font-size: clamp(19px, 2.2vw, 23px); color: var(--mute); max-width: 32ch; margin: 18px 0 26px; }
+  .hero .lede strong { color: var(--ink); font-weight: 600; }
+  .readout { margin: 0 0 24px; padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); min-height: 108px; }
+  .readout .title { font: 700 19px/1.3 var(--mono); }
+  .readout .genes { font: 13px/1.6 var(--mono); color: var(--mute); margin-top: 6px; }
+  .readout .genes b { color: var(--ink); font-weight: 400; }
+  .readout .more { font: 12px var(--mono); color: var(--neon); text-decoration: none; display: inline-block; margin-top: 8px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .cta .note { font: 12px var(--mono); color: var(--dim); }
+
+  /* ---- traits & rarity ---- */
+  .lookup { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+  .lookup input { flex: 1 1 320px; min-width: 0; min-height: 44px; padding: 10px 18px; border-radius: 999px; border: 1.5px solid var(--line);
+    background: var(--panel); color: var(--ink); font: 14px var(--mono); }
+  .lookup input:focus { outline: none; border-color: var(--neon); box-shadow: 0 0 14px var(--neon-soft); }
+  .lookup-note { font: 13px var(--mono); color: var(--mute); min-height: 1.5em; margin: 0 0 18px; }
+  .traits h3 { font: 700 22px/1.3 var(--mono); margin: 8px 0 4px; }
+  .traits .ttl { font-style: italic; }
+  .traits table { width: 100%; border-collapse: collapse; font: 14px/1.5 var(--mono); margin-top: 16px; }
+  .traits td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  .traits td:first-child { color: var(--dim); width: 32%; }
+  .traits td.p { text-align: right; color: var(--mute); white-space: nowrap; }
+  .traits tr.rare td { color: var(--neon); }
+  .traits .sum { margin-top: 14px; color: var(--ink); font: 14px var(--mono); }
+  .traits .src { margin-top: 6px; font: 12px var(--mono); color: var(--dim); }
+
+  /* ---- sections ---- */
+  section { padding: 72px 0; }
+  .head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
+  .head p { color: var(--mute); max-width: 52ch; margin: 0; }
+
+  /* how a cat is born */
+  .born { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  @media (max-width: 860px) { .born { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 24px; position: relative; overflow: hidden; }
+  .card .num { font: 64px/1 var(--display); color: var(--neon); opacity: .9; }
+  .card h3 { font: 700 18px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 10px; }
+  .card p { color: var(--mute); font-size: 16px; margin: 0; }
+  .card .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .chip { font: 12px var(--mono); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--mute); background: rgba(255, 255, 255, .02); }
+
+  /* temperaments */
+  .temps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 860px) { .temps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .temps { grid-template-columns: 1fr; } }
+  .temp { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .temp .n { font: 34px/1 var(--display); letter-spacing: .02em; }
+  .temp .pct { font: 12px var(--mono); color: var(--neon); align-self: center; }
+  .temp .d { grid-column: 1 / -1; font-size: 15px; color: var(--mute); }
+  .temp .bar { grid-column: 1 / -1; height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .temp .bar i { display: block; height: 100%; background: var(--neon); box-shadow: 0 0 8px var(--neon); }
+
+  /* gallery wall: framed portraits */
+  .wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+  @media (max-width: 900px) { .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .frame { background: linear-gradient(145deg, #d8b25a, #9a7424 60%, #e6c56f); padding: 7px; border-radius: 6px; cursor: pointer; border: 0;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .5); transition: transform .2s; text-align: left; color: inherit; font: inherit; }
+  .frame:hover { transform: translateY(-3px) rotate(-.4deg); }
+  .frame img { display: block; width: 100%; aspect-ratio: 1; background: #000; }
+  .frame .plaque { background: #120d18; padding: 8px 10px 9px; }
+  .frame .plaque b { display: block; font: 700 13px/1.3 var(--mono); }
+  .frame .plaque span { display: block; font: 11px/1.4 var(--mono); color: var(--dim); }
+  .skeleton { aspect-ratio: 1; background: linear-gradient(90deg, #1b1426, #241a33, #1b1426); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* mint panel */
+  .mint { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 24px; }
+  @media (max-width: 860px) { .mint { grid-template-columns: 1fr; } }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 22px 0; }
+  .stat { background: rgba(0, 0, 0, .25); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .stat small { display: block; font: 11px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .1em; }
+  .stat b { font: 34px/1.1 var(--display); letter-spacing: .02em; }
+  details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+  details summary { cursor: pointer; font: 700 15px var(--mono); list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  details summary::after { content: "+"; color: var(--neon); }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--mute); margin: 10px 0 0; font-size: 16px; }
+
+  /* credits */
+  .credits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  @media (max-width: 860px) { .credits { grid-template-columns: 1fr; } }
+  .credits ul { margin: 0; padding-left: 18px; color: var(--mute); font-size: 15px; }
+  .credits li { margin-bottom: 8px; }
+
+  /* the rug: you walk out across it */
+  .rug { height: 110px; margin-top: 24px; background:
+      repeating-linear-gradient(90deg, transparent 0 36px, rgba(255, 200, 95, .55) 36px 40px, transparent 40px 76px),
+      linear-gradient(180deg, #2a1640 0 16px, #ffc85f 16px 20px, #7a1e3c 20px 90px, #ffc85f 90px 94px, #2a1640 94px);
+    background-size: 76px 100%, 100% 100%; animation: walk 2s linear infinite; border-top: 1px solid var(--line); }
+  @keyframes walk { to { background-position: -76px 0, 0 0; } }
+  footer { padding: 26px 0 40px; font: 12px var(--mono); color: var(--dim); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+  @media (prefers-reduced-motion: reduce) { .rug, .skeleton { animation: none; } .frame, .btn { transition: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="brand neon" href="#top">PRANCERS</a>
+  <div class="links"><a href="#traits">Traits</a><a href="#born">How they're born</a><a href="#temperaments">Temperaments</a><a href="#gallery">Gallery</a><a href="#mint">Mint</a><a href="fact-sheet.html">Fact sheet</a><a class="btn" data-mint href="#">Mint</a></div>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="stage">
+    <iframe id="hero" title="A live Prancer — tap it to hear its theme song" allow="autoplay"></iframe>
+    <span class="tag">live · tap the cat for sound</span>
+  </div>
+  <div>
+    <div class="kicker">A generative collection on Aleatory</div>
+    <h1 class="neon">PRANCERS</h1>
+    <p class="lede"><strong>Cats that walk on the beat.</strong> Every one is born from its mint hash — a coat from real feline genetics, a temperament you can read in its body language, and a theme song sung in purrs, paws and meows.</p>
+    <div class="readout" aria-live="polite"><div class="title" id="h-title">Waking a cat…</div><div class="genes" id="h-genes"></div></div>
+    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><button class="btn ghost" id="roll" type="button">🎲 Meet another cat</button></div>
+  </div>
+</div></header>
+
+<section id="traits"><div class="wrap">
+  <div class="head"><div><div class="kicker">Traits &amp; rarity</div><h2>Look up your Prancer.</h2></div>
+    <p>Paste your mint's operation hash — it starts with “o”, and you'll find it in your wallet's history or on your piece's page — to put your cat on stage and see every trait with how rare it is. Until then, this is the cat above.</p></div>
+  <form class="lookup" id="lookup"><input id="hash" placeholder="Your mint operation hash (o…)" spellcheck="false" autocomplete="off" aria-label="Mint operation hash"><button class="btn" type="submit">Look up</button></form>
+  <p class="lookup-note" id="lookup-note" aria-live="polite"></p>
+  <div class="card traits" id="card" aria-live="polite"></div>
+</div></section>
+
+<section id="born"><div class="wrap">
+  <div class="head"><div><div class="kicker">How a Prancer is born</div><h2>One hash. Three layers.</h2></div>
+    <p>Nothing is picked by hand. The mint transaction's hash decides everything, and the whole generator lives on chain — no servers, no files that can go missing.</p></div>
+  <div class="born">
+    <div class="card"><div class="num">01</div><h3>Genes</h3><p>Coats follow real feline colour genetics — the orange gene, dilute, tabby patterns, white spotting, colorpoint — rendered in neon or lit. Rarity has a reason: a male calico is about 1 in 3,000, here as in life.</p>
+      <div class="chips"><span class="chip">Mackerel</span><span class="chip">Calico</span><span class="chip">Seal Point</span><span class="chip">Longhair</span><span class="chip">Rex</span><span class="chip">Maneki Gold</span></div></div>
+    <div class="card"><div class="num">02</div><h3>Temperament</h3><p>A hidden personality profile (the Feline Five) sets how the cat carries itself — ears, tail, eyes, whiskers — mapped from published cat body-language research. Once a loop it does its signature thing. Tap it and it reacts in character.</p>
+      <div class="chips"><span class="chip">Slow blink</span><span class="chip">Double-take</span><span class="chip">Yawn</span><span class="chip">Side-eye</span></div></div>
+    <div class="card"><div class="num">03</div><h3>Theme song</h3><p>Tap any cat and it sings. The purr is the bass, its paws are the drums, and its meows carry a melody in its own key — rising if it's content, falling if it isn't. Style comes from temperament; the room shapes the reverb.</p>
+      <div class="chips"><span class="chip">Brushed Jazz</span><span class="chip">Lo-fi</span><span class="chip">Disco-funk</span><span class="chip">Music Box</span></div></div>
+  </div>
+</div></section>
+
+<section id="temperaments"><div class="wrap">
+  <div class="head"><div><div class="kicker">Nine temperaments</div><h2>Every cat has a mood.</h2></div>
+    <p>Shares are the expected mix across the collection. Grumpy cats are kept uncommon; Regal ones mostly wear crowns.</p></div>
+  <div class="temps" id="temps"></div>
+</div></section>
+
+<section id="gallery"><div class="wrap">
+  <div class="head"><div><div class="kicker">The gallery wall</div><h2>Possible Prancers.</h2></div>
+    <p>Previews from random hashes — not minted, and not reserved. Tap a portrait to bring that cat to life above.</p></div>
+  <div class="wall" id="wall"></div>
+  <div class="cta" style="margin-top:22px"><button class="btn ghost" id="rehang" type="button">Hang new portraits</button></div>
+</div></section>
+
+<section id="mint"><div class="wrap mint">
+  <div class="card">
+    <div class="kicker">Mint</div><h2 style="margin-top:8px">Adopt a Prancer.</h2>
+    <div class="stats"><div class="stat"><small>Edition</small><b id="m-edition">TBA</b></div><div class="stat"><small>Price</small><b id="m-price">TBA</b></div><div class="stat"><small>Opens</small><b id="m-date">Soon</b></div></div>
+    <p style="color:var(--mute)">Minting happens on Aleatory. Your cat is decided by your mint's own hash — nobody, including you or the artist, can pick or predict it.</p>
+    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><a class="btn ghost" href="fact-sheet.html">Fact sheet</a><span class="note">fully on-chain · Tezos</span></div>
+  </div>
+  <div>
+    <details open><summary>What do I get?</summary><p>A one-of-a-kind cat as a Tezos token: a still cover image for marketplaces, and the live piece on Aleatory — walking, reacting and singing.</p></details>
+    <details><summary>Why can't I hear it right away?</summary><p>Browsers don't allow sound to autoplay. Tap or click the cat once and its theme song starts; press M to mute.</p></details>
+    <details><summary>What can I do with my cat?</summary><p>Tap it: it reacts in character and sings its theme song. Two buttons appear bottom left: 🔊 starts, mutes and unmutes the song, and <b>i</b> opens its card (name, title, song and every trait). On a keyboard, M and I do the same.</p></details>
+    <details><summary>Can I choose my cat?</summary><p>No — and that's the fun. The previews here are possibilities; your cat is born from your mint.</p></details>
+    <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, look it up <a href="#traits">here</a> with your mint's operation hash.</p></details>
+    <details><summary>Where does the art live?</summary><p>Entirely on the Tezos chain: the generator is a single self-contained file of about 31 KB (compressed) with no outside assets.</p></details>
+  </div>
+</div></section>
+
+<section id="credits"><div class="wrap credits">
+  <div class="card"><div class="kicker">With love to the community</div><h3 style="font:700 18px var(--mono);margin:10px 0">Ottez &amp; Tezzardz</h3>
+    <p style="color:var(--mute)">Some rooms hang fan-art portraits inspired by Ottez and Tezzardz, and some walls are papered in ꜩ — made with permission, as a nod to the Tezos art community these cats were born into.</p></div>
+  <div class="card"><div class="kicker">Grounded in research</div>
+    <ul style="margin-top:12px">
+      <li>Litchfield et al. 2017 — the “Feline Five” personality model</li>
+      <li>Kessler &amp; Turner 1997 — the Cat Stress Score</li>
+      <li>Cafazzo &amp; Natoli 2009; Deputte et al. 2021 — tails and ears</li>
+      <li>Humphrey et al. 2020 — the slow blink</li>
+      <li>Tavernier et al. 2020 — meow, chirp and purr acoustics</li>
+    </ul></div>
+</div></section>
+
+<div class="rug" aria-hidden="true"></div>
+<footer><div class="wrap"><span>PRANCERS · <span id="f-artist"></span></span><span>generative · fully on-chain · Tezos</span></div></footer>
+
+<script>
+/* ---- edit me ---- */
+const CONFIG = {
+  mintUrl: "https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw",   // the live collection on Aleatory mainnet
+  edition: "256", price: "10 ꜩ", opens: "Oct 1",
+  artist: "yoeshilabs",
+  generator: "prancers.html",                     // the built piece (copied here by tools/build.mjs)
+};
+/* expected shares, from prancers/data/temperament.json */
+const TEMPS = [
+  ["Curious", 16, "Tips its head up at the wall art as it passes."], ["Confident", 14, "Holds your eye and gives a slow blink."],
+  ["Playful", 13, "Pupils blow wide, tail tip lashing."], ["Sweet", 12, "Head tilt and a slow blink — the cat kiss."],
+  ["Sassy", 11, "Chin up, half-lidded side-eye."], ["Shy", 11, "A quick glance at you, then eyes down."],
+  ["Chill", 10, "One big, unhurried yawn."], ["Grumpy", 8, "Narrowed eyes, ears pressed sideways."], ["Regal", 5, "One slow, royal nod."]];
+
+const $ = (id) => document.getElementById(id);
+const seed = () => "oo" + Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[b % 58]).join("");
+document.querySelectorAll("[data-mint]").forEach((a) => { a.href = CONFIG.mintUrl; a.target = "_blank"; a.rel = "noopener"; });
+$("m-edition").textContent = CONFIG.edition; $("m-price").textContent = CONFIG.price; $("m-date").textContent = CONFIG.opens; $("f-artist").textContent = CONFIG.artist;
+
+/* hero: one live cat */
+const hero = $("hero");
+function showCat(s) {
+  $("h-title").textContent = "Waking a cat…"; $("h-genes").textContent = "";
+  hero.src = `${CONFIG.generator}?seed=${s}`;
+}
+hero.addEventListener("load", () => {
+  const x = hero.contentWindow.$alea && hero.contentWindow.$alea._features; if (!x) return;
+  $("h-title").textContent = x.Title;
+  $("h-genes").innerHTML = [["Temperament", x.Temperament], ["Coat", x.Coat], ["Song", `${x.Style} in ${x.Key}`], ["Gait", `${x.Gait} · ${x.Tempo}`]]
+    .map(([k, v]) => `${k} <b>${esc(v)}</b>`).join(" · ") + `<br><a class="more" href="#traits">All traits &amp; rarity ↓</a>`;
+  showTraits(x);
+});
+
+/* traits & rarity: shares from data/rarity.json (tools/rarity.html, copied here by tools/build.mjs) */
+const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+let RAR = null, LAST = null;
+fetch("rarity.json").then((r) => r.json()).then((j) => { RAR = j; if (LAST) showTraits(LAST); }).catch(() => {});
+function showTraits(x) {
+  LAST = x;
+  const T = RAR && RAR.traits, N = RAR && RAR.sample, rows = [], rare = [];
+  for (const k of ["Temperament", "Color", "Pattern", "White Spots", "Fur", "Finish", "Build", "Gait", "Eyes", "Ears", "Tail", "Accessory", "Key", "Style", "Wall", "Paint", "Decor", "Art", "Floor"]) {
+    const v = x[k]; if (v === undefined || (k === "Art" && v === "None")) continue;
+    const p = T && T[k] ? (T[k][v] || 0) / N : null, hot = p !== null && p < 0.05 && k !== "Key";   // 29 keys: every one is under 5%
+    if (hot) rare.push([p, k, v]);
+    rows.push(`<tr class="${hot ? "rare" : ""}"><td>${k}</td><td>${esc(v)}</td><td class="p">${p === null ? "" : p < 0.001 ? "&lt;0.1%" : (p * 100).toFixed(p < 0.1 ? 1 : 0) + "%"}${hot ? " ★" : ""}</td></tr>`);
+  }
+  rare.sort((a, b) => a[0] - b[0]);
+  $("card").innerHTML = `<div class="kicker">${esc(x.Coat)} · ${esc(x.Tempo)}</div><h3>${esc(x.Name)}</h3><p class="ttl">${esc(x.Title)}</p><table>${rows.join("")}</table>` +
+    (RAR ? `<p class="sum">${rare.length ? `★ ${rare.length} rare trait${rare.length > 1 ? "s" : ""} (under 5%) · rarest: ${esc(rare[0][2])} (${rare[0][1]}, ${rare[0][0] < 0.001 ? "&lt;0.1" : (rare[0][0] * 100).toFixed(1)}%)` : "No traits under 5% — a true classic."}</p>` +
+      `<p class="src">Shares from ${N.toLocaleString("en-US")} simulated mints.</p>` : "");
+}
+$("lookup").onsubmit = (e) => {
+  e.preventDefault();
+  const h = $("hash").value.trim();
+  if (!/^o[1-9A-HJ-NP-Za-km-z]{50}$/.test(h)) { $("lookup-note").textContent = "That doesn't look like an operation hash: it starts with “o” and is 51 characters long."; return; }
+  $("lookup-note").textContent = "Your Prancer is walking on stage above ↑ (tap it to hear its song).";
+  showCat(h);
+};
+$("roll").onclick = () => showCat(seed());
+showCat(seed());
+
+/* temperaments */
+const max = Math.max(...TEMPS.map((t) => t[1]));
+$("temps").innerHTML = TEMPS.map(([n, p, d]) => `<div class="temp"><div class="n">${n}</div><div class="pct">~${p}%</div><div class="d">${d}</div><div class="bar"><i style="width:${(p / max) * 100}%"></i></div></div>`).join("");
+
+/* gallery: portraits rendered from the generator, one hidden cat at a time */
+const scout = document.createElement("iframe"); scout.setAttribute("aria-hidden", "true"); scout.tabIndex = -1;
+scout.style.cssText = "position:fixed;left:-4000px;top:0;width:600px;height:600px;border:0"; document.body.appendChild(scout);
+let hang = 0;
+async function hangWall() {
+  const run = ++hang, wall = $("wall"); wall.innerHTML = "";
+  const slots = [...Array(8)].map(() => { const b = document.createElement("button"); b.className = "frame"; b.type = "button"; b.innerHTML = '<div class="skeleton"></div><div class="plaque"><b>&nbsp;</b><span>&nbsp;</span></div>'; wall.appendChild(b); return b; });
+  for (const slot of slots) {
+    const s = seed();
+    await new Promise((r) => { scout.onload = r; scout.src = `${CONFIG.generator}?seed=${s}`; });
+    if (run !== hang) return;
+    const w = scout.contentWindow, P = w.__prancer, x = w.$alea._features; if (P) P.draw(P.START);
+    let svg = w.document.querySelector("svg").outerHTML; if (!/xmlns=/.test(svg)) svg = svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+    const img = new Image(); img.alt = x.Title; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    slot.querySelector(".skeleton").replaceWith(img);
+    slot.querySelector("b").textContent = x.Name; slot.querySelector("span").textContent = `${x.Temperament} · ${x.Coat}`;
+    slot.setAttribute("aria-label", `Bring ${x.Name} to life`);
+    slot.onclick = () => { showCat(s); $("top").scrollIntoView(); };
+  }
+}
+$("rehang").onclick = hangWall;
+hangWall();
+</script>
+</body>
+</html>
