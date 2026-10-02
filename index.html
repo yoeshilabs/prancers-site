@@ -136,6 +136,21 @@
   .stat { background: rgba(0, 0, 0, .25); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
   .stat small { display: block; font: 11px var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .1em; }
   .stat b { font: 34px/1.1 var(--display); letter-spacing: .02em; }
+  #m-date { color: var(--neon); text-shadow: 0 0 14px var(--neon-soft); }
+  /* live minting status (read from the chain) */
+  .progress { display: grid; gap: 6px; margin: -8px 0 20px; }
+  .progress .row { display: flex; justify-content: space-between; font: 13px var(--mono); color: var(--mute); }
+  .progress .row b { color: var(--ink); font-weight: 700; }
+  .progress .track { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); overflow: hidden; }
+  .progress .track i { display: block; height: 100%; width: 0; background: var(--neon); box-shadow: 0 0 12px var(--neon-soft); transition: width .6s ease; }
+  .latest { margin-top: 22px; display: grid; gap: 10px; }
+  .latest h3 { font: 700 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin: 0; }
+  .latest .row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .mintcat { display: grid; gap: 6px; text-decoration: none; color: var(--ink); font: 11px/1.3 var(--mono); min-width: 0; }
+  .mintcat img, .mintcat .ph { width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); object-fit: cover; background: rgba(0, 0, 0, .3); display: grid; place-items: center; color: var(--dim); font-size: 10px; }
+  .mintcat:hover img { border-color: var(--neon); }
+  .mintcat span { overflow-wrap: anywhere; }
+  @media (max-width: 480px) { .latest .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   details { border-bottom: 1px solid var(--line); padding: 14px 0; }
   details summary { cursor: pointer; font: 700 15px var(--mono); list-style: none; display: flex; justify-content: space-between; gap: 12px; }
   details summary::after { content: "+"; color: var(--neon); }
@@ -176,7 +191,7 @@
     <h1 class="neon">PRANCERS</h1>
     <p class="lede"><strong>Cats that walk on the beat.</strong> Every one is born from its mint hash — a coat from real feline genetics, a temperament you can read in its body language, and a theme song sung in purrs, paws and meows.</p>
     <div class="readout" aria-live="polite"><div class="title" id="h-title">Waking a cat…</div><div class="genes" id="h-genes"></div></div>
-    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><button class="btn ghost" id="roll" type="button">🎲 Meet another cat</button></div>
+    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><button class="btn ghost" id="roll" type="button">🎲 Meet another cat</button><span class="note" id="h-live"></span></div>
   </div>
 </div></header>
 
@@ -217,9 +232,11 @@
 <section id="mint"><div class="wrap mint">
   <div class="card">
     <div class="kicker">Mint</div><h2 style="margin-top:8px">Adopt a Prancer.</h2>
-    <div class="stats"><div class="stat"><small>Edition</small><b id="m-edition">TBA</b></div><div class="stat"><small>Price</small><b id="m-price">TBA</b></div><div class="stat"><small>Opens</small><b id="m-date">Soon</b></div></div>
+    <div class="stats"><div class="stat"><small>Edition</small><b id="m-edition">TBA</b></div><div class="stat"><small>Price</small><b id="m-price">TBA</b></div><div class="stat"><small>Status</small><b id="m-date">Live</b></div></div>
+    <div class="progress" id="prog" hidden><div class="row"><b id="prog-n"></b><span id="prog-left"></span></div><div class="track"><i id="prog-bar"></i></div></div>
     <p style="color:var(--mute)">Minting happens on Aleatory. Your cat is decided by your mint's own hash — nobody, including you or the artist, can pick or predict it.</p>
     <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><a class="btn ghost" href="fact-sheet.html">Fact sheet</a><span class="note">fully on-chain · Tezos</span></div>
+    <div class="latest" id="latest-wrap" hidden><h3>Latest mints</h3><div class="row" id="latest"></div></div>
   </div>
   <div>
     <details open><summary>What do I get?</summary><p>A one-of-a-kind cat as a Tezos token: a still cover image for marketplaces, and the live piece on Aleatory — walking, reacting and singing.</p></details>
@@ -251,7 +268,7 @@
 /* ---- edit me ---- */
 const CONFIG = {
   mintUrl: "https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw",   // the live collection on Aleatory mainnet
-  edition: "256", price: "10 ꜩ", opens: "Oct 1",
+  edition: "256", price: "10 ꜩ", opens: "Live",
   artist: "yoeshilabs",
   generator: "prancers.html",                     // the built piece (copied here by tools/build.mjs)
 };
@@ -335,6 +352,35 @@ async function hangWall() {
 }
 $("rehang").onclick = hangWall;
 hangWall();
+
+/* live minting status, read from the chain through TzKT's public API: price, edition and
+   paused state from the contract's sale record, the count of minted tokens, and the newest
+   tokens with the name and cover the render provider wrote. Refreshes every minute; if the
+   API can't be reached the box simply stays "Live". */
+const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzkt.io/v1/";
+/* covers through Aleatory's own IPFS gateway (fast), falling back to Pinata's if an image fails */
+const ipfs = (u) => (u && u.startsWith("ipfs://") ? "https://ipfs.fileship.xyz/" + u.slice(7) : u);
+const ipfsAlt = (u) => (u && u.startsWith("ipfs://") ? "https://gateway.pinata.cloud/ipfs/" + u.slice(7) : "");
+async function liveStatus() {
+  try {
+    const get = (p) => fetch(API + p).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const [sale, minted, latest] = await Promise.all([get(`contracts/${KT}/storage?path=sale`), get(`tokens/count?contract=${KT}`),
+      get(`tokens?contract=${KT}&sort.desc=tokenId&limit=4&select=tokenId,metadata`)]);
+    const ed = +sale.edition_size, left = Math.max(0, ed - minted), sold = left === 0;
+    $("m-date").textContent = sold ? "Sold out" : sale.paused ? "Paused" : "Live";
+    $("m-price").textContent = +sale.price / 1e6 + " ꜩ"; $("m-edition").textContent = ed;
+    $("prog-n").textContent = `${minted} / ${ed} minted`; $("prog-left").textContent = sold ? "Sold out" : `${left} left`;
+    $("prog-bar").style.width = (100 * minted / ed).toFixed(1) + "%"; $("prog").hidden = false;
+    $("h-live").textContent = sold ? "Sold out" : `● Live · ${minted} / ${ed} minted`;
+    $("latest").innerHTML = latest.map((t) => { const m = t.metadata || {}, uri = m.thumbnailUri || m.displayUri, img = ipfs(uri);
+      const name = m.name ? m.name.replace(/^Prancers /, "") : `#${+t.tokenId + 1} · rendering…`;
+      return `<a class="mintcat" href="https://objkt.com/tokens/${KT}/${t.tokenId}" target="_blank" rel="noopener">` +
+        (img ? `<img src="${esc(img)}" data-alt="${esc(ipfsAlt(uri))}" alt="${esc(name)}" loading="lazy">` : `<span class="ph">Rendering…</span>`) + `<span>${esc(name)}</span></a>`; }).join("");
+    $("latest-wrap").hidden = !latest.length;
+    $("latest").querySelectorAll("img").forEach((i) => { i.onerror = () => { if (i.dataset.alt && i.src !== i.dataset.alt) i.src = i.dataset.alt; }; });
+  } catch (e) { /* offline or API unavailable: the box keeps saying Live */ }
+}
+liveStatus(); setInterval(liveStatus, 60000);
 </script>
 </body>
 </html>
