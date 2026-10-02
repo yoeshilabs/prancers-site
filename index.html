@@ -223,7 +223,7 @@
     <div>
       <form class="lookup" id="gifform"><input id="gifref" placeholder="aleatory.art/piece/… · objkt link · #12" spellcheck="false" autocomplete="off" aria-label="Prancer link, mint hash or number"><button class="btn" type="submit" id="gifgo">Make GIF</button></form>
       <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
-        <label>size <select id="gifsize"><option value="360">360 px</option><option value="480" selected>480 px</option><option value="640">640 px</option></select></label></div>
+        <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
       <p class="lookup-note" id="gifnote" aria-live="polite"></p>
       <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
       <div class="gifdl" id="gifdl" hidden><a class="btn" id="gifa" download>Download GIF</a></div>
@@ -451,7 +451,7 @@ $("gifform").onsubmit = async (e) => {
     const fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;left:-4000px;top:0;width:600px;height:600px;border:0"; fr.setAttribute("aria-hidden", "true");
     document.body.appendChild(fr); await new Promise((r) => { fr.onload = r; fr.src = `${CONFIG.generator}?seed=${encodeURIComponent(seed)}`; });
     const W = fr.contentWindow, P = W.__prancer; if (ref.seed) name = W.$alea._features.Name;
-    const size = +$("gifsize").value, FPS = 12, LT = P.LOOP * P.BEAT, N = Math.round(LT * FPS), t0 = Math.ceil(P.START / LT) * LT;
+    const size = +$("gifsize").value, FPS = 10, LT = P.LOOP * P.BEAT, N = Math.round(LT * FPS), t0 = Math.ceil(P.START / LT) * LT;
     const svg = W.document.querySelector("svg"), cv = document.createElement("canvas"); cv.width = cv.height = size; const cx = cv.getContext("2d");
     const gif = new GIF({ workers: 2, quality: 10, width: size, height: size, workerScript: gifLib, repeat: 0 });
     for (let i = 0; i < N; i++) {
@@ -468,7 +468,8 @@ $("gifform").onsubmit = async (e) => {
     const url = URL.createObjectURL(blob), slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), file = (slug.startsWith("prancers") ? slug : "prancers-" + slug) + ".gif";
     $("gifout").innerHTML = ""; const im = new Image(); im.src = url; im.alt = name; $("gifout").appendChild(im);
     $("gifa").href = url; $("gifa").download = file; $("gifdl").hidden = false;
-    note(`${name} · ${(blob.size / 1048576).toFixed(1)} MB · one seamless loop`);
+    const mb = blob.size / 1048576;
+    note(`${name} · ${mb.toFixed(1)} MB · one seamless loop` + (mb > 10 ? " · over Discord's 10 MB limit, so try a smaller size for Discord" : ""));
   } catch (err) { note(err.message || "Something went wrong making the GIF. Please try again."); }
   $("gifgo").disabled = false; $("gifbarw").hidden = true;
 };
