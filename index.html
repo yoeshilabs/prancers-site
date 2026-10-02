@@ -90,6 +90,19 @@
   .traits .sum { margin-top: 14px; color: var(--ink); font: 14px var(--mono); }
   .traits .src { margin-top: 6px; font: 12px var(--mono); color: var(--dim); }
 
+  /* ---- GIF maker ---- */
+  .gifmaker { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .gifmaker .opts { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font: 13px var(--mono); color: var(--mute); margin: 4px 0 14px; }
+  .gifmaker .opts label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+  .gifmaker .opts select { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: 13px var(--mono); }
+  .gifout { aspect-ratio: 1; width: 100%; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; overflow: hidden; }
+  .gifout img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .gifout p { font: 13px var(--mono); color: var(--dim); text-align: center; padding: 24px; margin: 0; }
+  .gifbar { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); overflow: hidden; margin-top: 12px; }
+  .gifbar i { display: block; height: 100%; width: 0; background: var(--neon); box-shadow: 0 0 12px var(--neon-soft); }
+  .gifdl { margin-top: 14px; }
+  @media (max-width: 760px) { .gifmaker { grid-template-columns: 1fr; } }
+
   /* ---- sections ---- */
   section { padding: 72px 0; }
   .head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
@@ -178,7 +191,7 @@
 <body>
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
-  <div class="links"><a href="#traits">Traits</a><a href="#born">How they're born</a><a href="#temperaments">Temperaments</a><a href="#gallery">Gallery</a><a href="#mint">Mint</a><a href="fact-sheet.html">Fact sheet</a><a class="btn" data-mint href="#">Mint</a></div>
+  <div class="links"><a href="#traits">Traits</a><a href="#gif">GIF</a><a href="#born">How they're born</a><a href="#temperaments">Temperaments</a><a href="#gallery">Gallery</a><a href="#mint">Mint</a><a href="fact-sheet.html">Fact sheet</a><a class="btn" data-mint href="#">Mint</a></div>
 </div></nav>
 
 <header class="hero" id="top"><div class="wrap">
@@ -201,6 +214,22 @@
   <form class="lookup" id="lookup"><input id="hash" placeholder="Your mint operation hash (o…)" spellcheck="false" autocomplete="off" aria-label="Mint operation hash"><button class="btn" type="submit">Look up</button></form>
   <p class="lookup-note" id="lookup-note" aria-live="polite"></p>
   <div class="card traits" id="card" aria-live="polite"></div>
+</div></section>
+
+<section id="gif"><div class="wrap">
+  <div class="head"><div><div class="kicker">Share yours</div><h2>Make a GIF of your Prancer.</h2></div>
+    <p>Paste your Prancer's link from Aleatory or objkt, its mint hash, or just its number. Your exact cat is redrawn here, walking one full loop of its song, as a GIF you can post anywhere.</p></div>
+  <div class="gifmaker">
+    <div>
+      <form class="lookup" id="gifform"><input id="gifref" placeholder="aleatory.art/piece/… · objkt link · #12" spellcheck="false" autocomplete="off" aria-label="Prancer link, mint hash or number"><button class="btn" type="submit" id="gifgo">Make GIF</button></form>
+      <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
+        <label>size <select id="gifsize"><option value="360">360 px</option><option value="480" selected>480 px</option><option value="640">640 px</option></select></label></div>
+      <p class="lookup-note" id="gifnote" aria-live="polite"></p>
+      <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
+      <div class="gifdl" id="gifdl" hidden><a class="btn" id="gifa" download>Download GIF</a></div>
+    </div>
+    <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
+  </div>
 </div></section>
 
 <section id="born"><div class="wrap">
@@ -243,6 +272,7 @@
     <details><summary>Why can't I hear it right away?</summary><p>Browsers don't allow sound to autoplay. Tap or click the cat once and its theme song starts; press M to mute.</p></details>
     <details><summary>What can I do with my cat?</summary><p>Tap it: it reacts in character and sings its theme song. Two buttons appear bottom left: 🔊 starts, mutes and unmutes the song, and <b>i</b> opens its card (name, title, song and every trait). On a keyboard, M and I do the same.</p></details>
     <details><summary>Can I choose my cat?</summary><p>No — and that's the fun. The previews here are possibilities; your cat is born from your mint.</p></details>
+    <details><summary>Can I share my cat as a GIF?</summary><p>Yes: paste its link or number into <a href="#gif">Make a GIF</a> above. Your cat is redrawn walking one full loop, ready to download and post.</p></details>
     <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, look it up <a href="#traits">here</a> with your mint's operation hash.</p></details>
     <details><summary>Where does the art live?</summary><p>Entirely on the Tezos chain: the generator is a single self-contained file of about 31 KB (compressed) with no outside assets.</p></details>
   </div>
@@ -381,6 +411,67 @@ async function liveStatus() {
   } catch (e) { /* offline or API unavailable: the box keeps saying Live */ }
 }
 liveStatus(); setInterval(liveStatus, 60000);
+
+/* GIF maker: find the token's mint hash on chain (TzKT), redraw that exact cat with the
+   generator in a hidden frame, frame by frame through one loop of its song (16 beats, so
+   the GIF loops seamlessly), and encode it in the browser with gif.js. Nothing is uploaded. */
+const B58 = "[1-9A-HJ-NP-Za-km-z]";
+function parseRef(s) {
+  s = s.trim();
+  const op = s.match(new RegExp("\\bo" + B58 + "{50}\\b")); if (op) return { seed: op[0] };
+  const tk = s.match(new RegExp("KT1" + B58 + "{33}/(\\d+)")); if (tk) return { tokenId: +tk[1] };      // aleatory.art/piece/… or objkt.com/tokens/…
+  const n = s.match(/^#?\s*(\d{1,3})$/); if (n && +n[1] > 0) return { tokenId: +n[1] - 1 };            // "#12" is token 11
+  return null;
+}
+let gifLib = null;
+async function loadGifLib() {
+  if (gifLib) return gifLib;
+  await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); });
+  const w = await (await fetch("https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js")).text();
+  gifLib = URL.createObjectURL(new Blob([w], { type: "application/javascript" }));
+  return gifLib;
+}
+const svgImage = (svg) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej;
+  i.src = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" })); });
+$("gifform").onsubmit = async (e) => {
+  e.preventDefault();
+  const note = (t) => { $("gifnote").textContent = t; }, ref = parseRef($("gifref").value);
+  if (!ref) { note("Paste a Prancer link from Aleatory or objkt, its mint hash (starts with “o”), or its number like #12."); return; }
+  $("gifgo").disabled = true; $("gifdl").hidden = true; $("gifbarw").hidden = false; $("gifbar").style.width = "0";
+  try {
+    let seed = ref.seed, name = "Prancer";
+    if (!seed) {
+      note("Finding your Prancer on chain…");
+      const t = await (await fetch(`${API}tokens?contract=${KT}&tokenId=${ref.tokenId}&select=tokenId,metadata`)).json();
+      seed = t[0] && t[0].metadata && t[0].metadata.aleaSeed;
+      if (!seed) throw new Error(t.length ? "That Prancer is still rendering. Try again in a few minutes." : "No Prancer with that number has been minted yet.");
+      name = t[0].metadata.name || name;
+    }
+    note("Drawing your cat…"); await loadGifLib();
+    const fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;left:-4000px;top:0;width:600px;height:600px;border:0"; fr.setAttribute("aria-hidden", "true");
+    document.body.appendChild(fr); await new Promise((r) => { fr.onload = r; fr.src = `${CONFIG.generator}?seed=${encodeURIComponent(seed)}`; });
+    const W = fr.contentWindow, P = W.__prancer; if (ref.seed) name = W.$alea._features.Name;
+    const size = +$("gifsize").value, FPS = 12, LT = P.LOOP * P.BEAT, N = Math.round(LT * FPS), t0 = Math.ceil(P.START / LT) * LT;
+    const svg = W.document.querySelector("svg"), cv = document.createElement("canvas"); cv.width = cv.height = size; const cx = cv.getContext("2d");
+    const gif = new GIF({ workers: 2, quality: 10, width: size, height: size, workerScript: gifLib, repeat: 0 });
+    for (let i = 0; i < N; i++) {
+      const t = t0 + i / FPS; P.click($("giftap").checked ? t0 + 2 * P.BEAT : null); P.draw(t);
+      let s = svg.outerHTML; if (!/xmlns=/.test(s)) s = s.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+      const img = await svgImage(s.replace("<svg", `<svg width="${size}" height="${size}"`));
+      cx.fillStyle = "#000"; cx.fillRect(0, 0, size, size); cx.drawImage(img, 0, 0, size, size); URL.revokeObjectURL(img.src);
+      gif.addFrame(cx, { copy: true, delay: Math.round(1000 / FPS) });
+      $("gifbar").style.width = (50 * (i + 1) / N).toFixed(1) + "%"; if (i % 12 === 0) note(`Drawing frame ${i + 1} of ${N}…`);
+    }
+    fr.remove(); note("Encoding the GIF…");
+    gif.on("progress", (p) => { $("gifbar").style.width = (50 + 50 * p).toFixed(1) + "%"; });
+    const blob = await new Promise((res) => { gif.on("finished", res); gif.render(); });
+    const url = URL.createObjectURL(blob), slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), file = (slug.startsWith("prancers") ? slug : "prancers-" + slug) + ".gif";
+    $("gifout").innerHTML = ""; const im = new Image(); im.src = url; im.alt = name; $("gifout").appendChild(im);
+    $("gifa").href = url; $("gifa").download = file; $("gifdl").hidden = false;
+    note(`${name} · ${(blob.size / 1048576).toFixed(1)} MB · one seamless loop`);
+  } catch (err) { note(err.message || "Something went wrong making the GIF. Please try again."); }
+  $("gifgo").disabled = false; $("gifbarw").hidden = true;
+};
 </script>
 </body>
 </html>
