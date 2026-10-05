@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-55AyqnRPSl5gjfhCCgGhFV7MCKMb81pifrTygRYhua0=' 'sha256-0rUCKapyVX1r6SbaHXagw/Zqp2LUzAwBseYyaLXv1Fs='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-55AyqnRPSl5gjfhCCgGhFV7MCKMb81pifrTygRYhua0=' 'sha256-uX5T4PNcwBU2d+jtv/syHlg8DeKMd1v/uc+LmnBRC94='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -290,10 +290,11 @@
   <div class="desk">
     <div class="pen" id="stage"><span class="who" id="stagewho"></span></div>
     <div>
-      <form class="lookup" id="d-watch"><input id="d-addr" placeholder="your address (tz1…) or name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn" type="submit">Find my cats</button></form>
+      <div id="d-pick"><div class="cta" style="margin-top:0"><button class="btn" id="d-connect" type="button">Connect wallet · read-only</button></div>
+      <form class="lookup" id="d-watch" style="margin-top:12px"><input id="d-addr" placeholder="or paste your address · name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn ghost" type="submit">Find my cats</button></form></div>
       <div class="cta" id="d-found" hidden style="margin-top:12px"><span class="note" id="d-who"></span><button class="btn ghost" id="d-disconnect" type="button">Change address</button></div>
       <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Once they're out: stroke a cat to pet it, click for its reaction, double-click anywhere to drop a treat, or grab the laser. They'll climb onto the page, too.</p>
-      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">No wallet connection: paste the address that holds your Prancers and we look them up on chain. Nothing to sign, nothing to approve.</p>
+      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Connecting only shares your address. This site asks your wallet for no other permission, and can't request transactions or signatures. Prefer not to connect? Paste your address instead.</p>
       <p class="claimnote" id="d-note" aria-live="polite">Paste the address that holds your Prancers.</p>
       <div class="deskcats" id="d-cats"></div>
       <div id="d-ctl" hidden>
@@ -348,7 +349,7 @@
     <details><summary>Can I choose my cat?</summary><p>No — and that's the fun. The previews here are possibilities; your cat is born from your mint.</p></details>
     <details><summary>Can I share my cat as a GIF?</summary><p>Yes: paste its link or number into <a href="#gif">Make a GIF</a> above. Your cat is redrawn walking one full loop, ready to download and post.</p></details>
     <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, look it up <a href="#traits">here</a> with your mint's operation hash.</p></details>
-    <details><summary>Do I need to connect my wallet?</summary><p>No. This site never connects to a wallet. For Desk Prancers you paste your address (or .tez name) and it reads which Prancers it holds from the public chain. Nothing here will ever ask you to sign, approve, or share your secret words — if a page claiming to be Prancers does, it isn't us. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
+    <details><summary>Is connecting my wallet safe?</summary><p>Connecting is read-only: this site asks your wallet for your address and no other permission — not transactions, not signatures. Its code can't send either. You can also skip connecting and paste your address (or .tez name). Nothing here will ever ask you to sign, approve a transaction, or share your secret words — if a page claiming to be Prancers does, it isn't us. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
     <details><summary>Where does the art live?</summary><p>Entirely on the Tezos chain: the generator is a single self-contained file of about 31 KB (compressed) with no outside assets.</p></details>
   </div>
 </div></section>
@@ -568,6 +569,7 @@ $("gifform").onsubmit = async (e) => {
    stays over whatever else they're doing. The behaviour is all desk.js. */
 import { Desk } from "./desk.js";
 import { lookup, clear } from "./address.js";
+import { connectReadOnly, disconnectWallet } from "./connect.js";
 const MAX = 6;
 if (innerWidth < 600) $("d-size").value = "80";                                 // phones: small cats
 let mine = [], chosen = new Set(), floor = null, pip = null, home = null;
@@ -595,8 +597,8 @@ function renderMine() {
     b.setAttribute("aria-pressed", chosen.has(i)); $("d-out").disabled = $("d-pip").disabled = !chosen.size; }; });
 }
 async function loadMine(a) {
-  if (!a) { mine = []; chosen.clear(); $("d-cats").innerHTML = ""; $("d-ctl").hidden = true; $("d-watch").hidden = false; $("d-found").hidden = true; $("d-who").textContent = ""; $("d-note").textContent = "Paste the address that holds your Prancers."; return; }
-  $("d-watch").hidden = true; $("d-found").hidden = false;
+  if (!a) { mine = []; chosen.clear(); $("d-cats").innerHTML = ""; $("d-ctl").hidden = true; $("d-pick").hidden = false; $("d-found").hidden = true; $("d-who").textContent = ""; $("d-note").textContent = "Paste the address that holds your Prancers."; return; }
+  $("d-pick").hidden = true; $("d-found").hidden = false;
   $("d-who").textContent = a.slice(0, 6) + "…" + a.slice(-4); $("d-note").textContent = "Finding your cats…";
   mine = await fetch(`${API}tokens/balances?account=${a}&token.contract=${KT}&balance.gt=0&limit=300&select=token.tokenId,token.metadata`).then((r) => r.json()).catch(() => []);
   mine.sort((x, y) => x["token.tokenId"] - y["token.tokenId"]);
@@ -608,7 +610,12 @@ async function loadMine(a) {
   if (!("documentPictureInPicture" in window)) $("d-pip").hidden = true;
 }
 addEventListener("address:change", (e) => loadMine(e.detail).catch(() => { $("d-note").textContent = "Couldn't read your Prancers just now. Please try again."; }));
-$("d-disconnect").onclick = () => { bringHome(); clear(); $("d-addr").value = ""; $("d-addr").focus(); };
+$("d-disconnect").onclick = () => { bringHome(); clear(); disconnectWallet(); $("d-addr").value = ""; };
+$("d-connect").onclick = async () => {
+  $("d-note").textContent = "Opening your wallet… it will only be asked for your address.";   // (no disabling: closing the picker doesn't report back, and a second click reuses the same request)
+  try { await lookup(await connectReadOnly()); }
+  catch (e) { $("d-note").textContent = /abort|reject|cancel|closed/i.test(String(e && (e.message || e.errorType || e))) ? "Not connected. You can paste your address instead." : "Your wallet didn't connect read-only, so we stopped there. Paste your address instead."; }
+};
 $("d-watch").onsubmit = async (e) => { e.preventDefault(); try { $("d-note").textContent = "Looking up…"; await lookup($("d-addr").value); } catch (err) { $("d-note").textContent = err.message || "Couldn't find that address."; } };
 
 const picks = () => [...chosen].map((i) => mine[i]).filter((t) => t["token.metadata"].aleaSeed);
