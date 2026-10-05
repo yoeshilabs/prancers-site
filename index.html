@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-5zfKDLRAu5/p2Z0mtxUDajF156nPPqsydInB92lmRb4=' 'sha256-1UjZ9/by9AfVcCKwumumhVk3rVwPjnukAS0wiJH5MlQ='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.tzkt.io https://rpc.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-55AyqnRPSl5gjfhCCgGhFV7MCKMb81pifrTygRYhua0=' 'sha256-0rUCKapyVX1r6SbaHXagw/Zqp2LUzAwBseYyaLXv1Fs='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -215,7 +215,6 @@
   .mycat .btn { padding: 10px 16px; font-size: 13px; }
   @media (max-width: 480px) { .mycat { grid-template-columns: 48px minmax(0, 1fr); } .mycat img, .mycat .ph { width: 48px; height: 48px; } .mycat > :last-child { grid-column: 1 / -1; } }
   .claim [hidden] { display: none !important; }
-  .framed #d-connect { display: none !important; }
   .claim .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
   .steps { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: s; }
   .steps li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; color: var(--mute); font-size: 15px; }
@@ -291,11 +290,11 @@
   <div class="desk">
     <div class="pen" id="stage"><span class="who" id="stagewho"></span></div>
     <div>
-      <div class="cta" style="margin-top:0"><button class="btn" id="d-connect" type="button">Connect wallet</button><button class="btn ghost" id="d-disconnect" type="button" hidden>Disconnect</button><span class="note" id="d-who"></span></div>
-      <form class="lookup" id="d-watch" style="margin-top:12px"><input id="d-addr" placeholder="or your address · name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn ghost" type="submit">Find my cats</button></form>
+      <form class="lookup" id="d-watch"><input id="d-addr" placeholder="your address (tz1…) or name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn" type="submit">Find my cats</button></form>
+      <div class="cta" id="d-found" hidden style="margin-top:12px"><span class="note" id="d-who"></span><button class="btn ghost" id="d-disconnect" type="button">Change address</button></div>
       <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Once they're out: stroke a cat to pet it, click for its reaction, double-click anywhere to drop a treat, or grab the laser. They'll climb onto the page, too.</p>
-      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Read-only either way: Desk Prancers only looks up which Prancers an address holds. It never asks your wallet to sign or send anything.</p>
-      <p class="claimnote" id="d-note" aria-live="polite">Connect the wallet that holds your Prancers.</p>
+      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">No wallet connection: paste the address that holds your Prancers and we look them up on chain. Nothing to sign, nothing to approve.</p>
+      <p class="claimnote" id="d-note" aria-live="polite">Paste the address that holds your Prancers.</p>
       <div class="deskcats" id="d-cats"></div>
       <div id="d-ctl" hidden>
         <div class="deskopts"><label>size <select id="d-size"><option value="80">small</option><option value="110" selected>medium</option><option value="150">large</option></select></label></div>
@@ -349,7 +348,7 @@
     <details><summary>Can I choose my cat?</summary><p>No — and that's the fun. The previews here are possibilities; your cat is born from your mint.</p></details>
     <details><summary>Can I share my cat as a GIF?</summary><p>Yes: paste its link or number into <a href="#gif">Make a GIF</a> above. Your cat is redrawn walking one full loop, ready to download and post.</p></details>
     <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, look it up <a href="#traits">here</a> with your mint's operation hash.</p></details>
-    <details><summary>Is connecting my wallet safe?</summary><p>Yes. Desk Prancers is read-only: it only looks up which Prancers an address holds, and you can simply type your address or .tez name instead of connecting. If you do connect, this site never asks your wallet to sign a message or send anything, and never asks for your secret words. Your wallet would show any request, and nothing happens unless you approve it there. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
+    <details><summary>Do I need to connect my wallet?</summary><p>No. This site never connects to a wallet. For Desk Prancers you paste your address (or .tez name) and it reads which Prancers it holds from the public chain. Nothing here will ever ask you to sign, approve, or share your secret words — if a page claiming to be Prancers does, it isn't us. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
     <details><summary>Where does the art live?</summary><p>Entirely on the Tezos chain: the generator is a single self-contained file of about 31 KB (compressed) with no outside assets.</p></details>
   </div>
 </div></section>
@@ -391,9 +390,6 @@ const $ = (id) => document.getElementById(id);
   const spy = () => { let cur = null; for (const sec of secs) if (sec.getBoundingClientRect().top < innerHeight * 0.4) cur = sec;
     for (const a of tabs) a.classList.toggle("on", !!cur && a.getAttribute("href") === "#" + cur.id); };
   addEventListener("scroll", spy, { passive: true }); addEventListener("resize", spy); spy(); }
-/* clickjacking guard: if another site frames this page, wallet buttons stay off (GitHub Pages can't send frame-ancestors) */
-const FRAMED = (() => { try { return window.top !== window.self; } catch (e) { return true; } })();
-if (FRAMED) document.documentElement.classList.add("framed");
 const seed = () => "oo" + Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[b % 58]).join("");
 document.querySelectorAll("[data-mint]").forEach((a) => { a.href = CONFIG.mintUrl; a.target = "_blank"; a.rel = "noopener"; });
 $("m-edition").textContent = CONFIG.edition; $("m-price").textContent = CONFIG.price; $("m-date").textContent = CONFIG.opens; $("f-artist").textContent = CONFIG.artist;
@@ -571,7 +567,7 @@ $("gifform").onsubmit = async (e) => {
    always-on-top window (Document Picture-in-Picture, Chrome and Edge) that
    stays over whatever else they're doing. The behaviour is all desk.js. */
 import { Desk } from "./desk.js";
-import { connect, disconnect, watch, mode } from "./wallet.js";
+import { lookup, clear } from "./address.js";
 const MAX = 6;
 if (innerWidth < 600) $("d-size").value = "80";                                 // phones: small cats
 let mine = [], chosen = new Set(), floor = null, pip = null, home = null;
@@ -599,22 +595,21 @@ function renderMine() {
     b.setAttribute("aria-pressed", chosen.has(i)); $("d-out").disabled = $("d-pip").disabled = !chosen.size; }; });
 }
 async function loadMine(a) {
-  if (!a) { mine = []; chosen.clear(); $("d-cats").innerHTML = ""; $("d-ctl").hidden = true; $("d-connect").hidden = $("d-watch").hidden = false; $("d-disconnect").hidden = true; $("d-who").textContent = ""; $("d-note").textContent = "Connect the wallet that holds your Prancers."; return; }
-  $("d-connect").hidden = $("d-watch").hidden = true; $("d-disconnect").hidden = false; $("d-disconnect").textContent = mode() === "watch" ? "Change address" : "Disconnect";
-  $("d-who").textContent = a.slice(0, 6) + "…" + a.slice(-4) + (mode() === "watch" ? " · read-only" : ""); $("d-note").textContent = "Finding your cats…";
+  if (!a) { mine = []; chosen.clear(); $("d-cats").innerHTML = ""; $("d-ctl").hidden = true; $("d-watch").hidden = false; $("d-found").hidden = true; $("d-who").textContent = ""; $("d-note").textContent = "Paste the address that holds your Prancers."; return; }
+  $("d-watch").hidden = true; $("d-found").hidden = false;
+  $("d-who").textContent = a.slice(0, 6) + "…" + a.slice(-4); $("d-note").textContent = "Finding your cats…";
   mine = await fetch(`${API}tokens/balances?account=${a}&token.contract=${KT}&balance.gt=0&limit=300&select=token.tokenId,token.metadata`).then((r) => r.json()).catch(() => []);
   mine.sort((x, y) => x["token.tokenId"] - y["token.tokenId"]);
-  if (!mine.length) { $("d-note").innerHTML = 'Desk Prancers are for holders, and this wallet has no Prancers yet. <a href="#mint">Adopt one</a> and come back.'; $("d-ctl").hidden = true; return; }
+  if (!mine.length) { $("d-note").innerHTML = 'Desk Prancers are for holders, and this address has no Prancers yet. <a href="#mint">Adopt one</a> and come back.'; $("d-ctl").hidden = true; return; }
   chosen = new Set(mine.map((t, i) => i).filter((i) => mine[i]["token.metadata"].aleaSeed).slice(0, 4));
   $("d-note").textContent = mine.length > 1 ? `Pick who comes out (up to ${MAX}).` : "Ready when you are.";
   renderMine(); $("d-ctl").hidden = false; $("d-out").disabled = $("d-pip").disabled = !chosen.size;
   $("d-pipnote").textContent = "documentPictureInPicture" in window ? "Pop out keeps them in a small window on top of everything else while you work." : "Pop out works in Chrome and Edge on a computer.";
   if (!("documentPictureInPicture" in window)) $("d-pip").hidden = true;
 }
-addEventListener("wallet:change", (e) => loadMine(e.detail).catch(() => { $("d-note").textContent = "Couldn't read your Prancers just now. Please try again."; }));
-$("d-connect").onclick = async () => { try { $("d-note").textContent = "Opening your wallet…"; await connect(); } catch (e) { $("d-note").textContent = "Wallet not connected."; } };
-$("d-disconnect").onclick = () => { bringHome(); disconnect(); };
-$("d-watch").onsubmit = async (e) => { e.preventDefault(); try { $("d-note").textContent = "Looking up…"; await watch($("d-addr").value); } catch (err) { $("d-note").textContent = err.message || "Couldn't find that address."; } };
+addEventListener("address:change", (e) => loadMine(e.detail).catch(() => { $("d-note").textContent = "Couldn't read your Prancers just now. Please try again."; }));
+$("d-disconnect").onclick = () => { bringHome(); clear(); $("d-addr").value = ""; $("d-addr").focus(); };
+$("d-watch").onsubmit = async (e) => { e.preventDefault(); try { $("d-note").textContent = "Looking up…"; await lookup($("d-addr").value); } catch (err) { $("d-note").textContent = err.message || "Couldn't find that address."; } };
 
 const picks = () => [...chosen].map((i) => mine[i]).filter((t) => t["token.metadata"].aleaSeed);
 function bringHome() { if (floor) { floor.stop(); floor.root.remove(); floor = null; } if (home) { home.remove(); home = null; } removeEventListener("keydown", laserKey); $("d-out").textContent = "Let them out"; }
