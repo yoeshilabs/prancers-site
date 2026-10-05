@@ -13,7 +13,10 @@
      more) is cleared before connecting, so only an address-only permission
      ever exists.
    - If a wallet refuses an address-only request, we stop there and ask for the
-     address to be pasted instead. We never fall back to asking for more. */
+     address to be pasted instead. We never fall back to asking for more.
+   - Once the address is read, the connection is dropped. Nothing here needs it
+     afterwards, and some wallets (Temple) grant every permission no matter
+     what was requested, so we don't keep what they hand back. */
 let client = null;
 const SCOPES = [];                                   // read the address; nothing else
 const OFF = ["requestOperation", "requestSignPayload", "requestEncryptPayload", "requestBroadcast",
@@ -33,10 +36,9 @@ export async function connectReadOnly() {
   const old = await c.getActiveAccount();
   if (old && (old.scopes || []).length) await c.clearActiveAccount();   // an older, broader permission: drop it
   const res = await c.requestPermissions({ scopes: SCOPES });
-  const granted = (res && res.scopes) || [];
   const a = res && res.address;
   if (!/^tz[1-4][1-9A-HJ-NP-Za-km-z]{33}$/.test(a || "")) throw new Error("No address came back from the wallet.");
-  if (granted.length) await c.clearActiveAccount().catch(() => {});      // a wallet that granted more than asked: we don't keep it
+  await c.clearActiveAccount().catch(() => {});                           // we have the address; keep nothing else
   return a;
 }
 export async function disconnectWallet() { if (client) await client.clearActiveAccount().catch(() => {}); }
