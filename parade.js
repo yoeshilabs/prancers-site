@@ -11,6 +11,7 @@
    screen exist at any moment. */
 import { me, who, connectForm, mountChip } from "./me.js";
 import { KT, API, freshMeta } from "./chain.js";
+if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");   // inside the site's studio: the street alone
 const PARADE_EPOCH = Date.UTC(2026, 9, 6);                 // the parade stepped off
 const $ = (id) => document.getElementById(id);
 const esc = (v) => String(v).replace(/[&<>"'`]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" })[c]);
@@ -198,6 +199,8 @@ function lists() {
   const catSlots = slots;
   $("p-mine").innerHTML = catSlots.filter((s) => mine.has(s.cat.id)).map((s) => [s, when(s)]).sort((a, b) => a[1] - b[1])
     .map(([s, t]) => `<li class="${t ? "" : "now"}"><b>#${s.cat.n} · ${esc(s.cat.name)}</b><span>${t ? "passes in " + fmt(t) : "marching now ★"}</span></li>`).join("");
+  const nx = catSlots.filter((s) => mine.has(s.cat.id)).map((s) => [s, when(s)]).sort((a, b) => a[1] - b[1])[0];
+  $("p-float").textContent = nx ? (nx[1] ? `★ #${nx[0].cat.n} · ${nx[0].cat.name} passes in ${fmt(nx[1])}` : `★ #${nx[0].cat.n} · ${nx[0].cat.name} is marching now`) : "";
   $("p-next").innerHTML = catSlots.map((s) => [s, when(s)]).filter(([, t]) => t > 0).sort((a, b) => a[1] - b[1]).slice(0, 5)
     .map(([s, t]) => `<li><b>#${s.cat.n} · ${esc(s.cat.name)}</b><span>${fmt(t)}</span></li>`).join("");
 }

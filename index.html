@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-GKpjFmitUv47nMcU2Tr3lPgkbfRotUmb8CnRznHnd/U=' 'sha256-ByFdexpDoE98MoxCNObUw+c/tWC579F+6eVxLpftMKE='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-meu6QFJNz4htksxM+S82JE6DNDM1iCIaAh+GhSryan0=' 'sha256-/KuKhCTtVpRaTs94g7poVsaG5zZmxvH83JFHepvQ6MQ='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,7 @@
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }   /* hidden means hidden, whatever the element's own display (.btn is inline-flex) */
   html { scroll-behavior: smooth; }
   body {
     margin: 0; color: var(--ink); font: 17px/1.6 var(--body);
@@ -194,45 +195,61 @@
   .desk [hidden] { display: none !important; }
   .desk .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
   /* the cats' layer covers the window but never takes a click; they climb whatever is on screen */
-  /* ---- your Prancers: the shelf, the stage and the tools ---- */
-  .shelf { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px; margin-bottom: 18px; scroll-snap-type: x proximity; }
-  .pc { flex: none; width: 132px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 6px; padding: 7px 7px 10px; border-radius: 14px; cursor: pointer; text-align: left;
+  /* ---- your Prancers: the shelf and its trait card, then the studio ---- */
+  .yourtop { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 24px; align-items: start; margin-bottom: 28px; }
+  @media (max-width: 900px) { .yourtop { grid-template-columns: 1fr; } }
+  .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 12px; align-content: start; }
+  .pc { display: flex; flex-direction: column; gap: 6px; padding: 7px 7px 10px; border-radius: 14px; cursor: pointer; text-align: left; min-width: 0;
     background: var(--panel); border: 1.5px solid var(--line); color: var(--ink); font: inherit; position: relative; transition: border-color .15s, box-shadow .15s, transform .15s; }
   .pc:hover { transform: translateY(-2px); }
   .pc[aria-pressed="true"] { border-color: var(--neon); box-shadow: 0 0 16px var(--neon-soft); }
-  .pc .im { width: 100%; aspect-ratio: 1; border-radius: 9px; background: #000; overflow: hidden; display: grid; place-items: center; }
+  .pc .im { width: 100%; aspect-ratio: 1; border-radius: 9px; background: #000; overflow: hidden; }
   .pc .im img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .pc b { font: 700 12px/1.25 var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pc small { font: 11px/1.2 var(--mono); color: var(--dim); }
   .pc .vis { position: absolute; top: 12px; left: 12px; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 6px; border-radius: 999px; background: rgba(14, 10, 20, .8); color: var(--gold); }
-  .pc .rm { position: absolute; top: 9px; right: 9px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(14, 10, 20, .8); color: var(--mute); cursor: pointer; font: 14px/1 var(--mono); }
-  .pc.add { cursor: default; width: 210px; justify-content: center; gap: 10px; padding: 14px; border-style: dashed; }
-  .pc.add:hover { transform: none; }
-  .pc.add p { margin: 0; font: 12px/1.45 var(--mono); color: var(--mute); }
-  .pc.add input { width: 100%; min-height: 38px; padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #0c0812; color: var(--ink); font: 12px var(--mono); }
-  .pc.add input:focus { outline: none; border-color: var(--neon); }
-  .pc.add .btn { min-height: 34px; padding: 6px 12px; font-size: 11px; }
-  .pc.hello { width: min(420px, 86vw); cursor: default; padding: 18px; gap: 4px; }
+  .pc.hello { grid-column: 1 / -1; cursor: default; padding: 18px; gap: 4px; }
   .pc.hello:hover { transform: none; }
   .pc.hello h3 { margin: 0; font: 700 17px/1.3 var(--mono); }
   .pc.hello p { margin: 0 0 6px; font-size: 14px; color: var(--mute); }
-  .studio { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 28px; align-items: start; }
-  @media (max-width: 880px) { .studio { grid-template-columns: 1fr; } }
-  .studio .stage .tag b { color: var(--ink); font-weight: 700; }
-  .tabs { display: flex; gap: 0; margin-bottom: 18px; border-bottom: 1px solid var(--line); overflow-x: auto; }
-  .tabs button { position: relative; flex: none; background: none; border: 0; cursor: pointer; padding: 12px 18px; color: var(--mute); font: 700 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-  .tabs button::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background: var(--neon); box-shadow: 0 0 8px var(--neon-soft); transform: scaleX(0); transition: transform .2s; }
+  .pc.hello .me-connect { max-width: 460px; }
+  /* the trait card, compact: two columns of traits */
+  #card { padding: 20px 22px; }
+  #card h3 { font: 700 20px/1.25 var(--mono); margin: 6px 0 2px; }
+  #card .ttl { font-style: italic; color: var(--mute); margin: 0 0 12px; font-size: 15px; }
+  .tgrid { columns: 2 220px; column-gap: 22px; font: 13px/1.4 var(--mono); }
+  .tgrid div { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) auto; gap: 8px; padding: 5px 0; border-top: 1px solid var(--line); break-inside: avoid; }
+  .tgrid span { color: var(--dim); } .tgrid i { font-style: normal; color: var(--mute); white-space: nowrap; }
+  .tgrid .rare b, .tgrid .rare i { color: var(--neon); }
+  .tgrid b { font-weight: 400; overflow-wrap: anywhere; }
+  #card .sum { margin: 12px 0 0; font: 13px var(--mono); } #card .src { margin: 4px 0 0; font: 11px var(--mono); color: var(--dim); }
+  /* the studio: one wide room, three things to do in it */
+  .studio { border-radius: 22px; border: 1px solid var(--line); background: linear-gradient(180deg, #170f22, #110b19); box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 60px rgba(255, 95, 162, .08); overflow: hidden; }
+  .tabs { display: flex; gap: 0; padding: 0 12px; border-bottom: 1px solid var(--line); overflow-x: auto; background: rgba(0, 0, 0, .2); }
+  .tabs button { position: relative; flex: none; background: none; border: 0; cursor: pointer; padding: 16px 20px; color: var(--mute); font: 700 13px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+  .tabs button::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--neon); box-shadow: 0 0 8px var(--neon-soft); transform: scaleX(0); transition: transform .2s; }
   .tabs button[aria-selected="true"] { color: var(--ink); }
   .tabs button[aria-selected="true"]::after { transform: scaleX(1); }
+  .panel { padding: 22px; }
   .panel[hidden] { display: none; }
-  .panel > p { color: var(--mute); font-size: 15px; }
+  .panel .lead { color: var(--mute); font-size: 15px; margin: 0 0 14px; max-width: 70ch; }
   .panel .small { color: var(--dim); font: 12px/1.5 var(--mono); margin: 10px 0 0; }
   .panel .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
-  .panel .gifout { margin-top: 16px; max-width: 420px; }
-  .panel .pen { margin-bottom: 14px; }
-  .panel .list { list-style: none; margin: 10px 0 16px; padding: 0; display: grid; gap: 6px; }
-  .panel .list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); font: 13px var(--mono); }
+  .gifroom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .gifroom { grid-template-columns: 1fr; } }
+  .gifroom .stage .tag b { color: var(--ink); font-weight: 700; }
+  .gifroom .gifout { margin-top: 16px; max-width: 360px; }
+  .deskroom { position: relative; height: clamp(300px, 34vw, 400px); border-radius: 16px; border: 1px solid var(--line); overflow: hidden; cursor: default;
+    background: linear-gradient(180deg, #150f1e 0 80%, #2a1640 80% 81.5%, #6e1b38 81.5%); }
+  .deskctl { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 14px; }
+  .deskctl .deskcats { margin: 0; }
+  .deskroom .who { position: absolute; left: 14px; bottom: 10px; font: 11px var(--mono); color: rgba(246, 239, 250, .8); pointer-events: none; z-index: 2; }
+  .paraderoom { position: relative; height: clamp(380px, 46vw, 560px); border-radius: 16px; border: 1px solid var(--line); overflow: hidden; background: #0c0812; }
+  .paraderoom iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .panel .list { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .panel .list li { display: flex; gap: 10px; padding: 7px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font: 12px var(--mono); }
   .panel .list li span { color: var(--dim); }
+  .panel .list li.now { border-color: var(--gold); color: var(--gold); }
   #deskfloor { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
   #deskbar { position: fixed; right: 16px; bottom: 16px; z-index: 61; display: flex; gap: 6px; padding: 6px; border-radius: 999px;
     background: rgba(14, 10, 20, .82); border: 1px solid var(--line); backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
@@ -303,45 +320,46 @@
 </div></header>
 
 <section id="yours"><div class="wrap">
-  <div class="head"><div><div class="kicker" id="y-kick">Your Prancers</div><h2 id="y-title">Bring your cats.</h2></div>
-    <p id="y-lede">Connect once and your Prancers follow you around the site: pick one to see its traits and rarity or make a GIF of it, let them out onto your screen, or find them in the Parade.</p></div>
-  <div class="shelf" id="shelf" aria-label="Your Prancers"></div>
+  <div class="head"><div><div class="kicker" id="y-kick">Your Prancers</div><h2 id="y-title">Un-chain your cats.</h2></div>
+    <p id="y-lede"></p></div>
+  <div class="yourtop">
+    <div class="shelf" id="shelf" aria-label="Your Prancers"></div>
+    <div class="card traits" id="card" aria-live="polite"></div>
+  </div>
   <div class="studio">
-    <div class="stage"><iframe id="y-stage" title="The Prancer you picked — tap it to hear its theme song" allow="autoplay"></iframe><span class="tag" id="y-tag">tap the cat for sound</span></div>
-    <div>
-      <div class="tabs" role="tablist" aria-label="What to do with this cat">
-        <button type="button" role="tab" data-tab="traits" aria-selected="true">Traits</button><button type="button" role="tab" data-tab="gif" aria-selected="false">GIF</button><button type="button" role="tab" data-tab="desk" aria-selected="false">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
-      </div>
-      <div class="panel" data-panel="traits" role="tabpanel"><div class="card traits" id="card" aria-live="polite"></div></div>
-      <div class="panel" data-panel="gif" role="tabpanel" hidden>
-        <p>Your cat walking one full loop of its song, redrawn here exactly, as a GIF you can post anywhere.</p>
-        <div class="gifmaker" style="display:block">
-          <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
-            <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
-          <div class="cta"><button class="btn" type="button" id="gifgo">Make GIF</button><a class="btn ghost" id="gifa" download hidden>Download GIF</a></div>
-          <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
-          <p class="lookup-note" id="gifnote" aria-live="polite" style="margin-top:10px"></p>
-          <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
+    <div class="tabs" role="tablist" aria-label="The studio">
+      <button type="button" role="tab" data-tab="gif" aria-selected="true">GIF</button><button type="button" role="tab" data-tab="desk" aria-selected="false">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
+    </div>
+    <div class="panel" data-panel="gif" role="tabpanel">
+      <div class="gifroom">
+        <div class="stage"><iframe id="y-stage" title="The Prancer you picked — tap it to hear its theme song" allow="autoplay"></iframe><span class="tag" id="y-tag">tap the cat for sound</span></div>
+        <div>
+          <p class="lead">Your cat walking one full loop of its song, redrawn here exactly, as a GIF you can post anywhere. Nothing is uploaded.</p>
+          <div class="gifmaker" style="display:block">
+            <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
+              <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
+            <div class="cta"><button class="btn" type="button" id="gifgo">Make GIF</button><a class="btn ghost" id="gifa" download hidden>Download GIF</a></div>
+            <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
+            <p class="lookup-note" id="gifnote" aria-live="polite" style="margin-top:10px"></p>
+            <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
+          </div>
         </div>
       </div>
-      <div class="panel" data-panel="desk" role="tabpanel" hidden>
-        <p>Your cats, off the canvas. They walk along the bottom of your screen, come over to see what your cursor is up to, nap when you go quiet, and react when you poke them.</p>
-        <div id="d-guest"><div class="pen" id="stage"><span class="who" id="stagewho"></span></div>
-          <p class="claimnote">Desk Prancers are for holders. <a href="#yours" data-me>Connect once</a> and yours can come out.</p></div>
-        <div id="d-own" hidden>
-          <div class="deskopts">Who comes out (up to 6) · <label>size <select id="d-size"><option value="80">small</option><option value="110" selected>medium</option><option value="150">large</option></select></label></div>
-          <div class="deskcats" id="d-cats"></div>
-          <div class="cta"><button class="btn" id="d-out" type="button">Let them out</button><button class="btn ghost" id="d-pip" type="button">Pop out window</button></div>
-          <p class="claimnote" id="d-pipnote"></p>
-          <p class="small">Once they're out: stroke a cat to pet it, click for its reaction, double-click anywhere to drop a treat, or grab the laser. They'll climb onto the page, too.</p>
-        </div>
+    </div>
+    <div class="panel" data-panel="desk" role="tabpanel" hidden>
+      <p class="lead" id="d-lead"></p>
+      <div class="deskroom" id="deskroom"><span class="who" id="deskwho"></span></div>
+      <div class="deskctl">
+        <div class="deskcats" id="d-cats"></div>
+        <div class="deskopts"><label>size <select id="d-size"><option value="80">small</option><option value="110" selected>medium</option><option value="150">large</option></select></label></div>
+        <button class="btn" id="d-out" type="button">Let them out</button>
       </div>
-      <div class="panel" data-panel="parade" role="tabpanel" hidden>
-        <p>Every minted Prancer marches down one street, in order, all day, and everyone watching sees the same parade at the same moment.</p>
-        <ul class="list" id="y-parade"></ul>
-        <div class="cta"><a class="btn" href="parade.html">Watch the Parade</a></div>
-        <p class="small" id="y-parnote"></p>
-      </div>
+      <p class="small" id="d-note">Stroke a cat to pet it, click for its reaction, double-click to drop a treat. Let them out and they roam this whole page, climbing onto buttons and cards.</p>
+    </div>
+    <div class="panel" data-panel="parade" role="tabpanel" hidden>
+      <div class="paraderoom" id="paraderoom"></div>
+      <ul class="list" id="y-parade"></ul>
+      <p class="small">Every minted Prancer marches down one street, in order, all day, and everyone watching sees the same parade at the same moment. Tap a cat to cheer it on. <a href="parade.html">Open the Parade full screen</a>.</p>
     </div>
   </div>
 </div></section>
@@ -467,11 +485,11 @@ function showTraits(x) {
     const v = x[k]; if (v === undefined || (k === "Art" && v === "None")) continue;
     const p = T && T[k] ? (T[k][v] || 0) / N : null, hot = p !== null && p < 0.05 && k !== "Key";   // 29 keys: every one is under 5%
     if (hot) rare.push([p, k, v]);
-    rows.push(`<tr class="${hot ? "rare" : ""}"><td>${k}</td><td>${esc(v)}</td><td class="p">${p === null ? "" : p < 0.001 ? "&lt;0.1%" : (p * 100).toFixed(p < 0.1 ? 1 : 0) + "%"}${hot ? " ★" : ""}</td></tr>`);
+    rows.push(`<div class="${hot ? "rare" : ""}"><span>${k}</span><b>${esc(v)}</b><i>${p === null ? "" : p < 0.001 ? "&lt;0.1%" : (p * 100).toFixed(p < 0.1 ? 1 : 0) + "%"}${hot ? " ★" : ""}</i></div>`);
   }
   rare.sort((a, b) => a[0] - b[0]);
-  $("card").innerHTML = `<div class="kicker">${esc(x.Coat)} · ${esc(x.Tempo)}</div><h3>${esc(x.Name)}</h3><p class="ttl">${esc(x.Title)}</p><table>${rows.join("")}</table>` +
-    (RAR ? `<p class="sum">${rare.length ? `★ ${rare.length} rare trait${rare.length > 1 ? "s" : ""} (under 5%) · rarest: ${esc(rare[0][2])} (${rare[0][1]}, ${rare[0][0] < 0.001 ? "&lt;0.1" : (rare[0][0] * 100).toFixed(1)}%)` : "No traits under 5% — a true classic."}</p>` +
+  $("card").innerHTML = `<div class="kicker">Traits · ${esc(x.Coat)} · ${esc(x.Tempo)}</div><h3>${esc(x.Name)}</h3><p class="ttl">${esc(x.Title)}</p><div class="tgrid">${rows.join("")}</div>` +
+    (RAR ? `<p class="sum">${rare.length ? `★ ${rare.length} rare trait${rare.length > 1 ? "s" : ""} (under 5%) · rarest: ${esc(rare[0][2])} (${rare[0][1]}, ${rare[0][0] < 0.001 ? "&lt;0.1" : (rare[0][0] * 100).toFixed(1)}%)` : "No traits under 5%: a classic."}</p>` +
       `<p class="src">Shares from ${N.toLocaleString("en-US")} simulated mints.</p>` : "");
 }
 $("roll").onclick = () => showCat(seed());
@@ -598,22 +616,24 @@ async function makeGif(seed, name) {
 
 <script type="module">
 /* Your Prancers. me.js knows who you are (connect once, read-only, or paste an address; it's
-   remembered on this browser), and every tool here works on the cat you pick from the shelf:
-   its traits, a GIF, Desk Prancers (your own cats only) and the Parade. Anyone can add any
-   Prancer to the shelf as a visitor, by number, link or mint hash. */
+   remembered on this browser). Pick a cat on the shelf and its trait card fills beside it; the
+   studio below works on your cats: a GIF of the one you picked, a desk room where your cats
+   roam (and from which they can be let out onto the whole page), and the Parade, live. Before
+   you connect, a minted cat visits so there's someone to show. */
 import { Desk } from "./desk.js";
 import { me, who, connectForm, mountChip } from "./me.js";
-import { tokenCat, randomCat } from "./chain.js";
+import { randomCat } from "./chain.js";
 const chip = mountChip($("me"));
 const MAX = 6;
 if (innerWidth < 600) $("d-size").value = "80";                                 // phones: small cats
-let visitors = [], focus = "", picked = false, chosen = new Set(), stray = null, floor = null, pip = null, home = null, pen = null;
+let visitors = [], focus = "", picked = false, chosen = new Set(), room = null, floor = null, home = null, parade = null;
 const key = (c) => (c.id != null ? "t" + c.id : "s" + c.seed);
 const own = () => me().cats.filter((c) => c.seed);
 const all = () => { const o = own(), k = new Set(o.map(key)); return [...o, ...visitors.filter((v) => !k.has(key(v)))]; };
 const label = (c) => (c.n ? `#${c.n} · ` : "") + (c.name || "A Prancer");
+const focused = () => all().find((o) => key(o) === focus);
 
-/* portraits for cats without a cover (a visitor looked up by its hash): drawn once by the generator */
+/* portraits for cats without a cover (the hero's cat): drawn once by the generator */
 const painter = document.createElement("iframe"); painter.setAttribute("aria-hidden", "true"); painter.tabIndex = -1;
 painter.style.cssText = "position:fixed;left:-4000px;top:0;width:400px;height:400px;border:0"; document.body.appendChild(painter);
 let paintQ = Promise.resolve();
@@ -625,47 +645,30 @@ const portrait = (c) => (paintQ = paintQ.then(() => new Promise((res) => { paint
 
 /* ---- the shelf ---- */
 function shelf() {
-  const S = me(), cats = all(), el = $("shelf");
+  const S = me(), cats = all(), el = $("shelf"), n = own().length;
   $("y-kick").textContent = S.address ? `Your Prancers · ${who()}` : "Your Prancers";
-  $("y-title").textContent = own().length ? (own().length > 1 ? "Your cats, ready." : "Your cat, ready.") : "Bring your cats.";
-  $("y-lede").textContent = own().length ? `Pick a cat to see its traits and rarity or make a GIF of it, let ${own().length > 1 ? "them" : "it"} out onto your screen, or find ${own().length > 1 ? "them" : "it"} in the Parade.`
-    : "Connect once and your Prancers follow you around the site: pick one to see its traits and rarity or make a GIF of it, let them out onto your screen, or find them in the Parade.";
+  $("y-title").textContent = n ? (n > 1 ? "Your cats, un-chained." : "Your cat, un-chained.") : "Un-chain your cats.";
+  $("y-lede").textContent = n ? `Pick a cat for its traits and a GIF, let ${n > 1 ? "them" : "it"} roam the studio or this whole page, and watch ${n > 1 ? "them" : "it"} march in the Parade.`
+    : "Connect once and your Prancers follow you around the site: their traits and rarity, a GIF to share, Desk Prancers on your screen, and the Parade.";
   let h = "";
-  if (S.status === "none" || S.status === "error") h += `<div class="pc hello"><h3>Connect once</h3><p>${S.status === "error" ? esc(S.note) : "Your Prancers show up here and in every tool on the site, the Parade too."}</p><div data-cf></div></div>`;
+  if (S.status === "none" || S.status === "error") h += `<div class="pc hello"><h3>Connect once</h3><p>${S.status === "error" ? esc(S.note) : "Your Prancers show up here and in every part of the studio, the Parade too."}</p><div data-cf></div></div>`;
   else if (S.status === "loading") h += `<div class="pc hello"><h3>Finding your cats…</h3><p>${esc(who())}</p></div>`;
-  else if (!own().length) h += `<div class="pc hello"><h3>No Prancers here yet</h3><p>${esc(who())} doesn't hold a Prancer. <a href="#mint">Adopt one</a>, or look any Prancer up on the right.</p></div>`;
+  else if (!n) h += `<div class="pc hello"><h3>No Prancers here yet</h3><p>${esc(who())} doesn't hold a Prancer. <a href="#mint">Adopt one</a> and it'll be waiting here.</p></div>`;
   h += cats.map((c) => `<button type="button" class="pc" data-k="${esc(key(c))}" aria-pressed="${key(c) === focus}">` +
     `<span class="im">${c.thumb ? `<img src="${esc(c.thumb)}" alt="" loading="lazy">` : ""}</span><b>${esc(label(c))}</b><small>${esc(c.temp || " ")}</small>` +
-    (c.visiting ? `<span class="vis">visiting</span><span class="rm" role="button" aria-label="Remove ${esc(c.name || "this cat")}" data-rm="${esc(key(c))}">×</span>` : "") + "</button>").join("");
-  h += `<form class="pc add" id="addcat"><p>Any Prancer: its number, its Aleatory or objkt link, or its mint hash.</p><input id="addref" placeholder="#12" spellcheck="false" autocomplete="off" aria-label="A Prancer's number, link or mint hash"><button class="btn ghost" type="submit">Add to shelf</button><p id="addnote" aria-live="polite"></p></form>`;
+    (c.visiting ? '<span class="vis">visiting</span>' : "") + "</button>").join("");
   el.innerHTML = h;
   const cf = el.querySelector("[data-cf]"); if (cf) connectForm(cf, { compact: true });
-  el.querySelectorAll("[data-k]").forEach((b) => { b.onclick = (e) => {
-    const rm = e.target.closest("[data-rm]"); if (rm) { visitors = visitors.filter((v) => key(v) !== rm.dataset.rm); if (focus === rm.dataset.rm) pick(all()[0], false); else shelf(); return; }
-    picked = true; pick(cats.find((c) => key(c) === b.dataset.k)); }; });
-  $("addcat").onsubmit = (e) => { e.preventDefault(); addRef($("addref").value); };
-  deskPanel(); paradePanel();
-}
-async function addRef(v) {
-  const note = (t) => { const n = $("addnote"); if (n) n.textContent = t; }, ref = parseRef(v);
-  if (!ref) { note("Try #12, a link, or a hash starting with “o”."); return; }
-  let c;
-  if (ref.seed) c = { seed: ref.seed, name: "", thumb: "", temp: "" };
-  else { note("Finding it on chain…"); try { c = await tokenCat(ref.tokenId); } catch (e) { note("Couldn't reach the chain just now."); return; }
-    if (!c) { note("No Prancer with that number has been minted yet."); return; }
-    if (!c.seed) { note("Couldn't read that one just now. Try again in a moment."); return; } }
-  if (!all().some((o) => key(o) === key(c))) visitors.push({ ...c, visiting: true });
-  picked = true; pick(all().find((o) => key(o) === key(c)));
-  if (!c.thumb) portrait(all().find((o) => key(o) === key(c)));
-  $("shelf").scrollTo({ left: $("shelf").scrollWidth, behavior: "smooth" });
+  el.querySelectorAll("[data-k]").forEach((b) => { b.onclick = () => { picked = true; pick(cats.find((c) => key(c) === b.dataset.k)); }; });
+  deskControls(); paradeList();
 }
 
-/* ---- the stage: the picked cat, live; its features fill the trait card ---- */
+/* ---- the picked cat: live in the GIF room; its features fill the trait card ---- */
 const stage = $("y-stage");
 let stageSeen = true;
 const stagePause = () => { try { stage.contentWindow.__paused = !stageSeen; } catch (e) {} };
 new IntersectionObserver(([e]) => { stageSeen = e.isIntersecting; stagePause(); }).observe(stage);
-function pick(c, user = true) {
+function pick(c) {
   if (!c) return;
   const k = key(c), same = k === focus; focus = k; shelf();
   $("y-tag").innerHTML = `<b>${esc(label(c))}</b> · tap for sound`;
@@ -675,48 +678,64 @@ function pick(c, user = true) {
   stage.src = `${CONFIG.generator}?seed=${encodeURIComponent(c.seed)}`;
 }
 stage.addEventListener("load", () => { stagePause(); const x = stage.contentWindow.$alea && stage.contentWindow.$alea._features; if (!x) return;
-  showTraits(x); const c = all().find((o) => key(o) === focus); if (c && !c.name) { c.name = x.Name; c.temp = x.Temperament; shelf(); } });
-const focused = () => all().find((o) => key(o) === focus);
+  showTraits(x); const c = focused(); if (c && !c.name) { c.name = x.Name; c.temp = x.Temperament; shelf(); } });
 $("gifgo").onclick = () => { const c = focused(); if (c) makeGif(c.seed, c.n ? `Prancers #${c.n} · ${c.name}` : c.name); };
 
-/* ---- tabs ---- */
+/* ---- the studio's tabs ---- */
 const tabs = [...document.querySelectorAll("#yours [data-tab]")];
-const tab = (t) => { for (const b of tabs) b.setAttribute("aria-selected", b.dataset.tab === t); document.querySelectorAll("#yours [data-panel]").forEach((p) => { p.hidden = p.dataset.panel !== t; });
-  if (t === "desk") teaser(); };
+let current = "gif";
+const tab = (t) => { current = t; for (const b of tabs) b.setAttribute("aria-selected", b.dataset.tab === t); document.querySelectorAll("#yours [data-panel]").forEach((p) => { p.hidden = p.dataset.panel !== t; });
+  if (t === "desk") fillRoom(); if (t === "parade") openParade(); };
 tabs.forEach((b) => { b.onclick = () => tab(b.dataset.tab); });
 document.addEventListener("click", (e) => { if (e.target.closest("[data-me]")) { e.preventDefault(); chip.open(true); } });
 
-/* hero → studio: "look closer" puts the hero's cat on the shelf as a visitor */
+/* hero → shelf: "look closer" brings the hero's cat down as a visitor */
 document.addEventListener("click", (e) => { if (!e.target.closest("#closer") || !heroSeed) return;
   const x = hero.contentWindow.$alea && hero.contentWindow.$alea._features, c = { seed: heroSeed, name: x ? x.Name : "", temp: x ? x.Temperament : "", thumb: "", visiting: true };
-  if (!all().some((o) => key(o) === key(c))) visitors.push(c); picked = true; pick(c); portrait(c); tab("traits"); });
+  if (!all().some((o) => key(o) === key(c))) { visitors.push(c); visitors = visitors.slice(-3); portrait(c); }
+  picked = true; pick(all().find((o) => key(o) === key(c))); tab("gif"); });
 
-/* ---- Desk Prancers: your own cats only ---- */
-function deskPanel() {
-  const o = own(); $("d-own").hidden = !o.length; $("d-guest").hidden = !!o.length;
-  if (!o.length) return;
+/* ---- Desk Prancers: a room in the studio; holders can let their cats out onto the whole page ---- */
+const roomCats = () => (own().length ? own().filter((c) => chosen.has(c.id)) : all()).slice(0, MAX);
+function deskControls() {
+  const o = own();
   for (const id of [...chosen]) if (!o.some((c) => c.id === id)) chosen.delete(id);
-  if (!chosen.size) o.slice(0, 4).forEach((c) => chosen.add(c.id));
+  if (o.length && !chosen.size) o.slice(0, 4).forEach((c) => chosen.add(c.id));
+  $("d-lead").textContent = o.length ? "Your cats, off the canvas. They wander, nap when you go quiet, come to see what your cursor is up to, and react when you poke them, each in its own temperament."
+    : "A visiting cat, to show you how it works. Desk Prancers are for holders: connect once and your own cats can roam here, and out across the whole page.";
   $("d-cats").innerHTML = o.map((c) => `<button class="deskcat" type="button" data-id="${c.id}" aria-pressed="${chosen.has(c.id)}">` +
     (c.thumb ? `<img src="${esc(c.thumb)}" alt="" loading="lazy">` : '<span class="ph"></span>') + `${esc(label(c))}</button>`).join("");
   $("d-cats").querySelectorAll("[data-id]").forEach((b) => { b.onclick = () => { const id = +b.dataset.id;
-    if (chosen.has(id)) chosen.delete(id); else if (chosen.size < MAX) chosen.add(id); else { $("d-pipnote").textContent = `Up to ${MAX} at once.`; return; }
-    b.setAttribute("aria-pressed", chosen.has(id)); $("d-out").disabled = $("d-pip").disabled = !chosen.size; }; });
-  $("d-out").disabled = $("d-pip").disabled = !chosen.size;
-  $("d-pipnote").textContent = "documentPictureInPicture" in window ? "Pop out keeps them in a small window on top of everything else while you work." : "";
-  $("d-pip").hidden = !("documentPictureInPicture" in window);
+    if (chosen.has(id)) chosen.delete(id); else if (chosen.size < MAX) chosen.add(id); else { $("d-note").textContent = `Up to ${MAX} at once.`; return; }
+    b.setAttribute("aria-pressed", chosen.has(id)); $("d-out").disabled = !chosen.size; syncRoom(); }; });
+  $("d-out").hidden = !o.length; $("d-out").disabled = !chosen.size;
+  $("d-note").textContent = "Stroke a cat to pet it, click for its reaction, double-click in the room to drop a treat." + (o.length ? " Let them out and they roam this whole page, climbing onto buttons and cards." : "");
+  if (room) syncRoom();
 }
-/* the teaser for visitors: one minted cat in a pen (made the first time the tab opens) */
-function teaser() { if (pen || !stray) return; pen = new Desk($("stage"), { size: 120, floor: 44 });
-  pen.add(stray.seed, { name: stray.name }).then((c) => { $("stagewho").textContent = label(stray) + " · " + c.I.temperament; }).catch(() => {}); }
-const picks = () => own().filter((c) => chosen.has(c.id));
-function bringHome() { if (floor) { floor.stop(); floor.root.remove(); floor = null; } if (home) { home.remove(); home = null; } removeEventListener("keydown", laserKey); $("d-out").textContent = "Let them out"; }
+function fillRoom() {
+  if (floor) return;
+  if (!room) { const r = $("deskroom"); room = new Desk(r, { size: +$("d-size").value, floor: Math.round(r.clientHeight * 0.17), treats: true, contain: true }); }
+  syncRoom();
+}
+/* the room holds exactly the cats it should: add the missing, send home the rest */
+function syncRoom() {
+  if (!room) return;
+  const want = roomCats(), ids = new Set(want.map(key));
+  for (const c of [...room.cats]) if (!ids.has(c.id)) room.remove(c.id);
+  for (const c of want) if (!room.cats.some((x) => x.id === key(c))) room.add(c.seed, { id: key(c), name: c.name }).catch(() => {});
+  $("deskwho").textContent = want.map(label).join("  ·  ");
+}
+$("d-size").onchange = () => { const s = +$("d-size").value; if (room) room.setSize(s); if (floor) floor.setSize(s); };
+function bringHome() { if (floor) { floor.stop(); floor.root.remove(); floor = null; } if (home) { home.remove(); home = null; } removeEventListener("keydown", laserKey);
+  $("d-out").textContent = "Let them out"; $("deskwho").textContent = ""; if (current === "desk") fillRoom(); }
 const laserKey = (e) => { if (e.key === "Escape" && floor && floor.dot) { floor.laser(false); home.querySelector("[data-laser]").setAttribute("aria-pressed", "false"); } };
 $("d-out").onclick = () => {
   if (floor) { bringHome(); return; }
+  if (room) { room.stop(); room = null; }                                         // out of the room, onto the page
+  $("deskwho").textContent = "They're out on the page. Bring them home when you're done.";
   const root = document.createElement("div"); root.id = "deskfloor"; document.body.appendChild(root);
   floor = new Desk(root, { size: +$("d-size").value, perch: true, treats: true });
-  for (const c of picks()) floor.add(c.seed, { id: c.id, name: c.name });
+  for (const c of own().filter((x) => chosen.has(x.id))) floor.add(c.seed, { id: c.id, name: c.name });
   /* the toy bar: a laser pointer to chase, a treat to share, and home */
   home = document.createElement("div"); home.id = "deskbar"; home.setAttribute("role", "toolbar"); home.setAttribute("aria-label", "Desk Prancers");
   home.innerHTML = '<button type="button" data-laser aria-pressed="false" title="Laser pointer (Esc to stop)">🔴 Laser</button><button type="button" data-treat title="Drop a treat (or double-click anywhere)">🐟 Treat</button><button type="button" data-home title="Bring them home">🏠 Home</button>';
@@ -727,44 +746,30 @@ $("d-out").onclick = () => {
   if (location.hostname === "localhost") window.__desk = floor;   // test hook, local only
   $("d-out").textContent = "Bring them home";
 };
-$("d-pip").onclick = async () => {
-  if (pip) { pip.close(); return; }
-  const size = +$("d-size").value, n = picks().length;
-  try { pip = await documentPictureInPicture.requestWindow({ width: Math.min(1100, 260 + n * size * 1.6), height: Math.round(size * 2.3) }); }
-  catch (e) { pip = null; $("d-pipnote").textContent = "This browser wouldn't open the pop-out window. Use Let them out instead, or try Chrome or Edge on a computer."; return; }
-  window.__deskWin(pip, size);
-};
-/* fills any window (the pop-out, or a test frame) with a desk of the chosen cats */
-window.__deskWin = (w, size) => {
-  const d = w.document; d.title = "Prancers";
-  d.body.style.cssText = "margin:0;height:100vh;overflow:hidden;background:linear-gradient(180deg,#150f1e 0 82%,#2a1640 82% 84%,#7a1e3c 84%);font:12px ui-monospace,Menlo,monospace";
-  const root = d.createElement("div"); root.style.cssText = "position:fixed;inset:0"; d.body.appendChild(root);
-  const desk = new Desk(root, { size, floor: Math.round(size * 0.12), treats: true });
-  for (const c of picks()) desk.add(c.seed, { id: c.id, name: c.name });
-  w.addEventListener("pagehide", () => { desk.stop(); pip = null; $("d-pip").textContent = "Pop out window"; });
-  if (w === pip) $("d-pip").textContent = "Close pop-out";
-  return desk;
-};
+if (location.hostname === "localhost") Object.defineProperty(window, "__room", { get: () => room });   // test hook, local only
 
-/* ---- the Parade ---- */
+/* ---- the Parade, live in the studio (the parade page, street only) ---- */
 const SECTION = { Regal: "Their Royal Highnesses", Confident: "The Confident Strutters", Sassy: "The Sass Squad", Playful: "The Zoomies Brigade", Curious: "The Curious Corps",
   Sweet: "The Sweethearts", Shy: "The Shy Ones", Chill: "The Chill Collective", Grumpy: "The Grumpy Section" };   // as on the Parade page
-function paradePanel() {
-  const o = own(), c = focused();
-  $("y-parade").innerHTML = (o.length ? o : c ? [c] : []).filter((x) => x.n).map((x) => `<li><b>${esc(label(x))}</b><span>${esc(SECTION[x.temp] || "marching")}</span></li>`).join("");
-  $("y-parnote").textContent = o.length ? `Your ${o.length > 1 ? o.length + " cats get" : "cat gets"} a spotlight as ${o.length > 1 ? "they pass" : "it passes"}, and the Parade page counts down to each.` : "Connect once and the Parade page will find your cats for you.";
+function openParade() { if (parade) return; parade = document.createElement("iframe"); parade.title = "The Prancer Parade, live"; parade.src = "parade.html?embed";
+  $("paraderoom").appendChild(parade); }
+function paradeList() {
+  const o = own();
+  $("y-parade").innerHTML = o.map((x) => `<li><b>${esc(label(x))}</b><span>${esc(SECTION[x.temp] || "marching")}</span></li>`).join("");
 }
 
 /* ---- you, arriving ---- */
+let lastAddr = me().address;
 addEventListener("me:change", () => {
-  if (me().status === "none") { bringHome(); chosen.clear(); }
+  const S = me();
+  if (S.status === "none") { bringHome(); chosen.clear(); }
   const o = own(); if (o.length) visitors = visitors.filter((v) => !v.auto);   // the stand-in visitor steps aside for your own cats
-  if (o.length && (!picked || !all().some((c) => key(c) === focus))) pick(o[0], false); else if (!focused() && all()[0]) pick(all()[0], false); else shelf();
+  if (o.length && (!picked || !all().some((c) => key(c) === focus))) pick(o[0]); else if (!focused() && all()[0]) pick(all()[0]); else shelf();
+  if (parade && S.address !== lastAddr && S.status !== "loading") parade.src = "parade.html?embed";   // the parade spotlights whoever's here now
+  lastAddr = S.address;
 });
 shelf();
-/* before you connect: a minted cat visits, so the tools have someone to show */
-randomCat().then((c) => { if (!c) return; stray = c; if (!$("d-guest").hidden && !$("yours").querySelector('[data-panel="desk"]').hidden) teaser();
-  if (!own().length && !visitors.length) { visitors.push({ ...c, visiting: true, auto: true }); pick(visitors[0], false); } }).catch(() => {});
+randomCat().then((c) => { if (!c || own().length || visitors.length) return; visitors.push({ ...c, visiting: true, auto: true }); pick(visitors[0]); }).catch(() => {});
 </script>
 </body>
 </html>

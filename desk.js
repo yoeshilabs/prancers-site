@@ -1,6 +1,6 @@
 /* Desk Prancers: Prancers that live in a window.
 
-   The engine behind "Let them out" on the site, the pop-out window, and later
+   The engine behind "Let them out" on the site, the studio's desk room, and later
    the desktop app. Each cat is its own pet build (pet.html?seed=…), the exact
    cat its mint drew, alone on a transparent background. This file decides
    what every cat does from moment to moment and moves it; the cat draws
@@ -43,9 +43,9 @@ const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const BUSY = new Set(["air", "fall", "prep", "land", "react", "pet", "eat", "stalk", "greet"]);
 
 export class Desk {
-  constructor(root, { size = 110, floor = 8, perch = false, treats = false, petUrl = new URL("pet.html", import.meta.url).href, onpoke = null } = {}) {
+  constructor(root, { size = 110, floor = 8, perch = false, treats = false, contain = false, petUrl = new URL("pet.html", import.meta.url).href, onpoke = null } = {}) {
     this.root = root; this.doc = root.ownerDocument; this.win = this.doc.defaultView; this.size = size; this.floor = floor;
-    this.perchOn = perch; this.petUrl = petUrl; this.onpoke = onpoke;
+    this.perchOn = perch; this.petUrl = petUrl; this.onpoke = onpoke; this.contain = contain;   // contain: keep every cat wholly inside the root (a box on the page)
     this.cats = []; this.pointer = null; this.lastMove = performance.now(); this.running = true; this.treats = []; this.dot = null;
     this.tag = this._el("div", "position:absolute;z-index:999;pointer-events:none;padding:4px 10px;border-radius:999px;font:700 12px/1.3 ui-monospace,Menlo,monospace;" +
       "color:#f6effa;background:rgba(14,10,20,.86);border:1px solid #ff5fa2;box-shadow:0 0 12px rgba(255,95,162,.45);white-space:nowrap;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%)");
@@ -62,7 +62,9 @@ export class Desk {
     this._dbl = (e) => {
       if (e.target.closest && e.target.closest("a,button,input,select,textarea,summary,label,iframe,[contenteditable]")) return;
       const s = W.getSelection && W.getSelection(); if (s) s.removeAllRanges();
-      const r = this._rect(); this.treat(e.clientX - r.left, e.clientY - r.top);
+      const r = this._rect();
+      if (this.contain && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) return;   // a box only takes treats dropped in it
+      this.treat(e.clientX - r.left, e.clientY - r.top);
     };
     this._scroll = () => { const now = performance.now(), y = W.scrollY, v = this._sy == null ? 0 : Math.abs(y - this._sy) / Math.max(0.016, (now - this._st) / 1000);
       this._sy = y; this._st = now;
@@ -101,7 +103,7 @@ export class Desk {
           surf: null, air: null, state: "pause", until: 0, ctl: { walk: 0 }, pokes: [], petT: 0, petTotal: 0, cool: 0, puffT: 0,
           tw: TEMPS[pet.info.temperament] || TEMPS.Curious };
         this._size(c); c.sx = c.dir;
-        c.cx = rnd(c.half, Math.max(c.half + 1, this.root.clientWidth - c.half)); c.gy = this.floorY - c.depth * 6;
+        c.cx = rnd(this._edge(c), Math.max(this._edge(c) + 1, this.root.clientWidth - this._edge(c))); c.gy = this.floorY - c.depth * 6;
         f.style.visibility = "visible";
         this.cats.push(c); this._choose(c, performance.now()); res(c);
       };
@@ -185,8 +187,10 @@ export class Desk {
   /* the floor, or the top of whatever the cat is standing on, in root coordinates */
   _bounds(c) {
     if (c.surf) { const r = c.surf.getBoundingClientRect(), R = this._rect(), a = r.left - R.left + c.half * 0.5; return [a, Math.max(a, r.right - R.left - c.half * 0.5)]; }
-    return [c.half * 0.6, this.root.clientWidth - c.half * 0.6];
+    return [this._edge(c), this.root.clientWidth - this._edge(c)];
   }
+  /* how near the side walls a cat's middle may come: on the open page a cat can step half off-screen; in a box, never */
+  _edge(c) { return this.contain ? c.W * 0.55 : c.half * 0.6; }
   _perchable(el, c) {
     if (!el.isConnected || this.root.contains(el)) return null;
     const r = el.getBoundingClientRect(), R = this._rect(), top = r.top - R.top;
@@ -214,7 +218,7 @@ export class Desk {
     c.air = { x0, y0, x1, y1, surf, h: h ?? (y1 < y0 ? 40 : 24), t: 0, dur: 0.42 + Math.abs(y1 - y0) / 1400 + Math.abs(dx) / 1600, go: false };
   }
   _hopDown(c, now, toward) {
-    const lo = c.half * 0.6, hi = this.root.clientWidth - c.half * 0.6, d = toward != null ? Math.sign(toward - c.cx) || c.dir : c.dir;
+    const lo = this._edge(c), hi = this.root.clientWidth - this._edge(c), d = toward != null ? Math.sign(toward - c.cx) || c.dir : c.dir;
     this._jump(c, now, clamp(c.cx + d * rnd(50, 110), lo, hi), this.floorY - c.depth * 6, null, 22);
   }
 

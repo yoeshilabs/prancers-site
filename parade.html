@@ -95,6 +95,12 @@
   ul.list li.now span { color: var(--neon); }
   @media (prefers-reduced-motion: reduce) { #crowd .row { animation: none !important; } }
   .top .me-btn { min-height: 34px; }
+  /* embedded in the site's studio (parade.html?embed): the street alone, with your next cat floating on it */
+  .embed .top, .embed main { display: none !important; }
+  .embed #street { height: 100vh; min-height: 0; }
+  #p-float { position: absolute; left: 14px; top: 14px; z-index: 5; display: none; padding: 7px 12px; border-radius: 999px; background: rgba(14, 10, 20, .82);
+    border: 1px solid var(--gold); color: var(--ink); font: 700 12px var(--mono); pointer-events: none; }
+  .embed #p-float:not(:empty) { display: block; }
   .me-connect .lookup { margin-top: 10px; }
 </style>
 <link href="me.css" rel="stylesheet">
@@ -113,6 +119,7 @@
   <div id="crowd"><svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true" id="crowdsvg"></svg></div>
   <canvas id="confetti"></canvas>
   <button class="btn ghost" id="sound" type="button" aria-pressed="false">🔊 Play the march</button>
+  <div id="p-float" aria-live="polite"></div>
 </section>
 
 <main>
