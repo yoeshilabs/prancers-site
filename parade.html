@@ -94,10 +94,13 @@
   ul.list li.now { border-color: var(--neon); box-shadow: 0 0 12px var(--neon-soft); }
   ul.list li.now span { color: var(--neon); }
   @media (prefers-reduced-motion: reduce) { #crowd .row { animation: none !important; } }
+  .top .me-btn { min-height: 34px; }
+  .me-connect .lookup { margin-top: 10px; }
 </style>
+<link href="me.css" rel="stylesheet">
 </head>
 <body>
-<div class="top"><a class="brand" href="index.html">PRANCERS</a><a class="back" href="index.html#desk">← Back to the site</a></div>
+<div class="top"><a class="brand" href="index.html">PRANCERS</a><a class="back" href="index.html#yours">← Your Prancers</a><div id="me"></div></div>
 
 <section id="street" aria-label="The Prancer Parade, live">
   <div class="sky"></div>
@@ -114,12 +117,11 @@
 
 <main>
   <div class="card">
-    <div class="kicker">Find your cats</div>
+    <div class="kicker" id="p-kick">Your cats</div>
     <h2>Your Prancers, marching.</h2>
-    <p>The parade never stops: every minted Prancer, in order, on a loop, and everyone watching sees the same parade at the same moment. Find your cats to see when they march past, and they'll get a spotlight when they do.</p>
-    <div class="row"><button class="btn" id="p-connect" type="button">Connect wallet · read-only</button></div>
-    <form class="lookup" id="p-watch"><input id="p-addr" placeholder="or paste your address · name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn ghost" type="submit">Find</button></form>
-    <p class="note" id="p-note" aria-live="polite">Connecting only shares your address; nothing to sign.</p>
+    <p>The parade never stops: every minted Prancer, in order, on a loop, and everyone watching sees the same parade at the same moment. Your cats get a spotlight as they march past.</p>
+    <div id="p-connect"></div>
+    <p class="note" id="p-note" aria-live="polite"></p>
     <ul class="list" id="p-mine"></ul>
   </div>
   <div class="card">

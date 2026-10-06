@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-khanbB96y4Z0aBDlicMF0jqUMhKN8DpIZ7fqTuqwZOA=' 'sha256-71WR/TnAYRoYG/cqPI9ZXT8aAioaz/PY7WDP9j6tm5g='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-GKpjFmitUv47nMcU2Tr3lPgkbfRotUmb8CnRznHnd/U=' 'sha256-ByFdexpDoE98MoxCNObUw+c/tWC579F+6eVxLpftMKE='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="me.css" rel="stylesheet">
 <style>
   /* ---- the room: plum-black walls, ꜩ wallpaper, one hot-pink neon ---- */
   :root {
@@ -193,6 +194,45 @@
   .desk [hidden] { display: none !important; }
   .desk .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
   /* the cats' layer covers the window but never takes a click; they climb whatever is on screen */
+  /* ---- your Prancers: the shelf, the stage and the tools ---- */
+  .shelf { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 14px; margin-bottom: 18px; scroll-snap-type: x proximity; }
+  .pc { flex: none; width: 132px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 6px; padding: 7px 7px 10px; border-radius: 14px; cursor: pointer; text-align: left;
+    background: var(--panel); border: 1.5px solid var(--line); color: var(--ink); font: inherit; position: relative; transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .pc:hover { transform: translateY(-2px); }
+  .pc[aria-pressed="true"] { border-color: var(--neon); box-shadow: 0 0 16px var(--neon-soft); }
+  .pc .im { width: 100%; aspect-ratio: 1; border-radius: 9px; background: #000; overflow: hidden; display: grid; place-items: center; }
+  .pc .im img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pc b { font: 700 12px/1.25 var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pc small { font: 11px/1.2 var(--mono); color: var(--dim); }
+  .pc .vis { position: absolute; top: 12px; left: 12px; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 6px; border-radius: 999px; background: rgba(14, 10, 20, .8); color: var(--gold); }
+  .pc .rm { position: absolute; top: 9px; right: 9px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(14, 10, 20, .8); color: var(--mute); cursor: pointer; font: 14px/1 var(--mono); }
+  .pc.add { cursor: default; width: 210px; justify-content: center; gap: 10px; padding: 14px; border-style: dashed; }
+  .pc.add:hover { transform: none; }
+  .pc.add p { margin: 0; font: 12px/1.45 var(--mono); color: var(--mute); }
+  .pc.add input { width: 100%; min-height: 38px; padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #0c0812; color: var(--ink); font: 12px var(--mono); }
+  .pc.add input:focus { outline: none; border-color: var(--neon); }
+  .pc.add .btn { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+  .pc.hello { width: min(420px, 86vw); cursor: default; padding: 18px; gap: 4px; }
+  .pc.hello:hover { transform: none; }
+  .pc.hello h3 { margin: 0; font: 700 17px/1.3 var(--mono); }
+  .pc.hello p { margin: 0 0 6px; font-size: 14px; color: var(--mute); }
+  .studio { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 28px; align-items: start; }
+  @media (max-width: 880px) { .studio { grid-template-columns: 1fr; } }
+  .studio .stage .tag b { color: var(--ink); font-weight: 700; }
+  .tabs { display: flex; gap: 0; margin-bottom: 18px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .tabs button { position: relative; flex: none; background: none; border: 0; cursor: pointer; padding: 12px 18px; color: var(--mute); font: 700 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+  .tabs button::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background: var(--neon); box-shadow: 0 0 8px var(--neon-soft); transform: scaleX(0); transition: transform .2s; }
+  .tabs button[aria-selected="true"] { color: var(--ink); }
+  .tabs button[aria-selected="true"]::after { transform: scaleX(1); }
+  .panel[hidden] { display: none; }
+  .panel > p { color: var(--mute); font-size: 15px; }
+  .panel .small { color: var(--dim); font: 12px/1.5 var(--mono); margin: 10px 0 0; }
+  .panel .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+  .panel .gifout { margin-top: 16px; max-width: 420px; }
+  .panel .pen { margin-bottom: 14px; }
+  .panel .list { list-style: none; margin: 10px 0 16px; padding: 0; display: grid; gap: 6px; }
+  .panel .list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); font: 13px var(--mono); }
+  .panel .list li span { color: var(--dim); }
   #deskfloor { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
   #deskbar { position: fixed; right: 16px; bottom: 16px; z-index: 61; display: flex; gap: 6px; padding: 6px; border-radius: 999px;
     background: rgba(14, 10, 20, .82); border: 1px solid var(--line); backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
@@ -244,7 +284,8 @@
 <body>
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
-  <div class="links"><a href="#traits">Traits</a><a href="#gif">GIF</a><a href="#desk">Desk Prancers</a><a href="parade.html">Parade</a><a href="#born" data-p="3">How they're born</a><a href="#temperaments" data-p="3">Temperaments</a><a href="#gallery" data-p="2">Gallery</a><a href="#mint">Adopt</a><a href="fact-sheet.html" data-p="2">Fact sheet</a><a class="btn" data-mint href="#">Mint</a></div>
+  <div class="links"><a href="#yours">Your Prancers</a><a href="parade.html">Parade</a><a href="#born" data-p="3">How they're born</a><a href="#temperaments" data-p="3">Temperaments</a><a href="#gallery" data-p="2">Gallery</a><a href="#mint">Adopt</a><a href="fact-sheet.html" data-p="2">Fact sheet</a><a class="btn" data-mint href="#">Mint</a></div>
+  <div id="me"></div>
 </div></nav>
 
 <header class="hero" id="top"><div class="wrap">
@@ -261,50 +302,46 @@
   </div>
 </div></header>
 
-<section id="traits"><div class="wrap">
-  <div class="head"><div><div class="kicker">Traits &amp; rarity</div><h2>Look up your Prancer.</h2></div>
-    <p>Paste your mint's operation hash — it starts with “o”, and you'll find it in your wallet's history or on your piece's page — to put your cat on stage and see every trait with how rare it is. Until then, this is the cat above.</p></div>
-  <form class="lookup" id="lookup"><input id="hash" placeholder="Your mint operation hash (o…)" spellcheck="false" autocomplete="off" aria-label="Mint operation hash"><button class="btn" type="submit">Look up</button></form>
-  <p class="lookup-note" id="lookup-note" aria-live="polite"></p>
-  <div class="card traits" id="card" aria-live="polite"></div>
-</div></section>
-
-<section id="gif"><div class="wrap">
-  <div class="head"><div><div class="kicker">Share yours</div><h2>Make a GIF of your Prancer.</h2></div>
-    <p>Paste your Prancer's link from Aleatory or objkt, its mint hash, or just its number. Your exact cat is redrawn here, walking one full loop of its song, as a GIF you can post anywhere.</p></div>
-  <div class="gifmaker">
+<section id="yours"><div class="wrap">
+  <div class="head"><div><div class="kicker" id="y-kick">Your Prancers</div><h2 id="y-title">Bring your cats.</h2></div>
+    <p id="y-lede">Connect once and your Prancers follow you around the site: pick one to see its traits and rarity or make a GIF of it, let them out onto your screen, or find them in the Parade.</p></div>
+  <div class="shelf" id="shelf" aria-label="Your Prancers"></div>
+  <div class="studio">
+    <div class="stage"><iframe id="y-stage" title="The Prancer you picked — tap it to hear its theme song" allow="autoplay"></iframe><span class="tag" id="y-tag">tap the cat for sound</span></div>
     <div>
-      <form class="lookup" id="gifform"><input id="gifref" placeholder="aleatory.art/piece/… · objkt link · #12" spellcheck="false" autocomplete="off" aria-label="Prancer link, mint hash or number"><button class="btn" type="submit" id="gifgo">Make GIF</button></form>
-      <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
-        <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
-      <p class="lookup-note" id="gifnote" aria-live="polite"></p>
-      <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
-      <div class="gifdl" id="gifdl" hidden><a class="btn" id="gifa" download>Download GIF</a></div>
-    </div>
-    <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
-  </div>
-</div></section>
-
-<section id="desk"><div class="wrap">
-  <div class="head"><div><div class="kicker">Desk Prancers · holders only · new</div><h2>Let your Prancers out.</h2></div>
-    <p>Your cats, off the canvas. They walk along the bottom of your screen, come over to see what your cursor is up to, nap when you go quiet, and react when you poke them, each in its own temperament. Hold several? Bring the whole family.</p></div>
-  <div class="desk">
-    <div class="pen" id="stage"><span class="who" id="stagewho"></span></div>
-    <div>
-      <div id="d-pick"><div class="cta" style="margin-top:0"><button class="btn" id="d-connect" type="button">Connect wallet · read-only</button></div>
-      <form class="lookup" id="d-watch" style="margin-top:12px"><input id="d-addr" placeholder="or paste your address · name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn ghost" type="submit">Find my cats</button></form></div>
-      <div class="cta" id="d-found" hidden style="margin-top:12px"><span class="note" id="d-who"></span><button class="btn ghost" id="d-disconnect" type="button">Change address</button></div>
-      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Once they're out: stroke a cat to pet it, click for its reaction, double-click anywhere to drop a treat, or grab the laser. They'll climb onto the page, too.</p>
-      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0">Connecting only shares your address. This site asks your wallet for no other permission, can't request transactions or signatures, and lets go of the connection as soon as it has read your address. Prefer not to connect? Paste your address instead.</p>
-      <p style="color:var(--dim);font:12px/1.5 var(--mono);margin:8px 0 0"><b style="color:var(--mute)">Using Temple?</b> Its approval screen lists the same three permissions as “Allowed” for every site, whatever the site asks for. This site asks only for your address and never uses the rest.</p>
-      <p class="claimnote" id="d-note" aria-live="polite">Paste the address that holds your Prancers.</p>
-      <div class="deskcats" id="d-cats"></div>
-      <div id="d-ctl" hidden>
-        <div class="deskopts"><label>size <select id="d-size"><option value="80">small</option><option value="110" selected>medium</option><option value="150">large</option></select></label></div>
-        <div class="cta"><button class="btn" id="d-out" type="button">Let them out</button><button class="btn ghost" id="d-pip" type="button">Pop out window</button></div>
-        <p class="claimnote" id="d-pipnote"></p>
+      <div class="tabs" role="tablist" aria-label="What to do with this cat">
+        <button type="button" role="tab" data-tab="traits" aria-selected="true">Traits</button><button type="button" role="tab" data-tab="gif" aria-selected="false">GIF</button><button type="button" role="tab" data-tab="desk" aria-selected="false">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
       </div>
-      <p style="color:var(--dim);font:13px/1.5 var(--mono);margin-top:14px">Next: a desktop app, so they can roam your whole screen while you work.</p>
+      <div class="panel" data-panel="traits" role="tabpanel"><div class="card traits" id="card" aria-live="polite"></div></div>
+      <div class="panel" data-panel="gif" role="tabpanel" hidden>
+        <p>Your cat walking one full loop of its song, redrawn here exactly, as a GIF you can post anywhere.</p>
+        <div class="gifmaker" style="display:block">
+          <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
+            <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
+          <div class="cta"><button class="btn" type="button" id="gifgo">Make GIF</button><a class="btn ghost" id="gifa" download hidden>Download GIF</a></div>
+          <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
+          <p class="lookup-note" id="gifnote" aria-live="polite" style="margin-top:10px"></p>
+          <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
+        </div>
+      </div>
+      <div class="panel" data-panel="desk" role="tabpanel" hidden>
+        <p>Your cats, off the canvas. They walk along the bottom of your screen, come over to see what your cursor is up to, nap when you go quiet, and react when you poke them.</p>
+        <div id="d-guest"><div class="pen" id="stage"><span class="who" id="stagewho"></span></div>
+          <p class="claimnote">Desk Prancers are for holders. <a href="#yours" data-me>Connect once</a> and yours can come out.</p></div>
+        <div id="d-own" hidden>
+          <div class="deskopts">Who comes out (up to 6) · <label>size <select id="d-size"><option value="80">small</option><option value="110" selected>medium</option><option value="150">large</option></select></label></div>
+          <div class="deskcats" id="d-cats"></div>
+          <div class="cta"><button class="btn" id="d-out" type="button">Let them out</button><button class="btn ghost" id="d-pip" type="button">Pop out window</button></div>
+          <p class="claimnote" id="d-pipnote"></p>
+          <p class="small">Once they're out: stroke a cat to pet it, click for its reaction, double-click anywhere to drop a treat, or grab the laser. They'll climb onto the page, too.</p>
+        </div>
+      </div>
+      <div class="panel" data-panel="parade" role="tabpanel" hidden>
+        <p>Every minted Prancer marches down one street, in order, all day, and everyone watching sees the same parade at the same moment.</p>
+        <ul class="list" id="y-parade"></ul>
+        <div class="cta"><a class="btn" href="parade.html">Watch the Parade</a></div>
+        <p class="small" id="y-parnote"></p>
+      </div>
     </div>
   </div>
 </div></section>
@@ -349,9 +386,9 @@
     <details><summary>Why can't I hear it right away?</summary><p>Browsers don't allow sound to autoplay. Tap or click the cat once and its theme song starts; press M to mute.</p></details>
     <details><summary>What can I do with my cat?</summary><p>Tap it: it reacts in character and sings its theme song. Two buttons appear bottom left: 🔊 starts, mutes and unmutes the song, and <b>i</b> opens its card (name, title, song and every trait). On a keyboard, M and I do the same.</p></details>
     <details><summary>Can I choose my cat?</summary><p>No — and that's the fun. The previews here are possibilities; your cat is born from your mint.</p></details>
-    <details><summary>Can I share my cat as a GIF?</summary><p>Yes: paste its link or number into <a href="#gif">Make a GIF</a> above. Your cat is redrawn walking one full loop, ready to download and post.</p></details>
-    <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, look it up <a href="#traits">here</a> with your mint's operation hash.</p></details>
-    <details><summary>Is connecting my wallet safe?</summary><p>Connecting is read-only: this site asks your wallet for your address and no other permission — not transactions, not signatures. Its code can't send either, and it drops the connection once it has your address. (Temple's approval screen lists the same permissions for every site, whatever the site requests; this site still uses only your address.) You can also skip connecting and paste your address (or .tez name). Nothing here will ever ask you to sign, approve a transaction, or share your secret words — if a page claiming to be Prancers does, it isn't us. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
+    <details><summary>Can I share my cat as a GIF?</summary><p>Yes: in <a href="#yours">Your Prancers</a>, pick it and open the GIF tab. Your cat is redrawn walking one full loop, ready to download and post. (Any Prancer works too: add it to the shelf by number or link.)</p></details>
+    <details><summary>Where can I see my cat's traits?</summary><p>On the live piece, tap the <b>i</b> button (bottom left) or press I for its card: name, title, song and every trait. For rarity, pick it in <a href="#yours">Your Prancers</a>: the Traits tab shows how rare each one is.</p></details>
+    <details id="faq-wallet"><summary>Is connecting my wallet safe?</summary><p>Connecting is read-only: this site asks your wallet for your address and no other permission — not transactions, not signatures. Its code can't send either, and it drops the connection once it has your address. (Temple's approval screen lists the same permissions for every site, whatever the site requests; this site still uses only your address.) You can also skip connecting and paste your address (or .tez name). Nothing here will ever ask you to sign, approve a transaction, or share your secret words — if a page claiming to be Prancers does, it isn't us. Always check you're on <b>yoeshilabs.tez.page</b>.</p></details>
     <details><summary>Where does the art live?</summary><p>Entirely on the Tezos chain: the generator is a single self-contained file of about 31 KB (compressed) with no outside assets.</p></details>
   </div>
 </div></section>
@@ -404,6 +441,7 @@ let heroSeen = true;
 const heroPause = () => { try { hero.contentWindow.__paused = !heroSeen; } catch (e) {} };
 new IntersectionObserver(([e]) => { heroSeen = e.isIntersecting; heroPause(); }).observe(hero);
 hero.addEventListener("load", heroPause);
+let heroSeed = "";
 function showCat(s) {
   $("h-title").textContent = "Waking a cat…"; $("h-genes").textContent = "";
   hero.src = `${CONFIG.generator}?seed=${s}`;
@@ -412,8 +450,8 @@ hero.addEventListener("load", () => {
   const x = hero.contentWindow.$alea && hero.contentWindow.$alea._features; if (!x) return;
   $("h-title").textContent = x.Title;
   $("h-genes").innerHTML = [["Temperament", x.Temperament], ["Coat", x.Coat], ["Song", `${x.Style} in ${x.Key}`], ["Gait", `${x.Gait} · ${x.Tempo}`]]
-    .map(([k, v]) => `${k} <b>${esc(v)}</b>`).join(" · ") + `<br><a class="more" href="#traits">All traits &amp; rarity ↓</a>`;
-  showTraits(x);
+    .map(([k, v]) => `${k} <b>${esc(v)}</b>`).join(" · ") + `<br><a class="more" href="#yours" id="closer">Look closer: traits, GIF ↓</a>`;
+  heroSeed = new URL(hero.src).searchParams.get("seed");
 });
 
 /* traits & rarity: shares from data/rarity.json (tools/rarity.html, copied here by tools/build.mjs) */
@@ -436,13 +474,6 @@ function showTraits(x) {
     (RAR ? `<p class="sum">${rare.length ? `★ ${rare.length} rare trait${rare.length > 1 ? "s" : ""} (under 5%) · rarest: ${esc(rare[0][2])} (${rare[0][1]}, ${rare[0][0] < 0.001 ? "&lt;0.1" : (rare[0][0] * 100).toFixed(1)}%)` : "No traits under 5% — a true classic."}</p>` +
       `<p class="src">Shares from ${N.toLocaleString("en-US")} simulated mints.</p>` : "");
 }
-$("lookup").onsubmit = (e) => {
-  e.preventDefault();
-  const h = $("hash").value.trim();
-  if (!/^o[1-9A-HJ-NP-Za-km-z]{50}$/.test(h)) { $("lookup-note").textContent = "That doesn't look like an operation hash: it starts with “o” and is 51 characters long."; return; }
-  $("lookup-note").textContent = "Your Prancer is walking on stage above ↑ (tap it to hear its song).";
-  showCat(h);
-};
 $("roll").onclick = () => showCat(seed());
 showCat(seed());
 
@@ -484,33 +515,6 @@ const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzkt.io/v1
 const CIDP = (u) => (typeof u === "string" && /^ipfs:\/\/[A-Za-z0-9]{46,64}(\/[A-Za-z0-9._-]+)*$/.test(u) ? u.slice(7) : "");
 const ipfs = (u) => (CIDP(u) ? "https://ipfs.fileship.xyz/" + CIDP(u) : "");
 const ipfsAlt = (u) => (CIDP(u) ? "https://gateway.pinata.cloud/ipfs/" + CIDP(u) : "");
-/* TzKT reads each token's metadata file from IPFS on its own schedule and can fall hours
-   behind (objkt runs its own indexer, so it doesn't). For a token TzKT hasn't resolved yet, the
-   site follows the contract's own token_metadata link and reads the file itself. If IPFS is slow
-   too, the seed is still on chain: it's the mint's operation hash, so the cat can be drawn anyway. */
-async function freshMeta(ids) {
-  const out = {}; if (!ids.length) return out;
-  const get = (u) => fetch(u, { signal: AbortSignal.timeout(8000) }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-  const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/, CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})$/;
-  try {
-    const keys = await get(`${API}contracts/${KT}/bigmaps/token_metadata/keys?${ids.length > 1 ? "key.in=" + ids.join(",") : "key=" + ids[0]}&select=key,value`);
-    await Promise.all(keys.map(async (k) => { try {
-      const hx = String((k.value && k.value.token_info && k.value.token_info[""]) || ""), uri = hx.replace(/[0-9a-f]{2}/g, (h) => String.fromCharCode(parseInt(h, 16)));
-      const cid = CID.exec(uri); if (!cid) return;
-      const m = await get("https://ipfs.fileship.xyz/" + cid[1]);
-      out[k.key] = { name: typeof m.name === "string" ? m.name : "", thumbnailUri: m.thumbnailUri, displayUri: m.displayUri,
-        attributes: Array.isArray(m.attributes) ? m.attributes : [], aleaSeed: SEED.test(m.aleaSeed || "") ? m.aleaSeed : undefined };
-    } catch (e) { /* this one falls back to its mint hash below */ } }));
-  } catch (e) { /* likewise */ }
-  const need = ids.filter((id) => !(out[id] && out[id].aleaSeed));
-  if (need.length) try {
-    const tr = await get(`${API}tokens/transfers?token.contract=${KT}&from.null=true&token.tokenId.in=${need.join(",")}&limit=1000&select=token.tokenId,transactionId`);
-    const ops = tr.length ? await get(`${API}operations/transactions?id.in=${tr.map((t) => t.transactionId).join(",")}&limit=1000&select=id,hash,target`) : [];
-    for (const t of tr) { const op = ops.find((o) => o.id === t.transactionId);
-      if (op && op.target && op.target.address === KT && SEED.test(op.hash)) out[t["token.tokenId"]] = { name: "", attributes: [], ...(out[t["token.tokenId"]] || {}), aleaSeed: op.hash }; }
-  } catch (e) { /* the cat waits for TzKT */ }
-  return out;
-}
 async function liveStatus() {
   try {
     const get = (p) => fetch(API + p).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
@@ -522,6 +526,7 @@ async function liveStatus() {
     $("prog-n").textContent = `${minted} / ${ed} minted`; $("prog-left").textContent = sold ? "Sold out" : `${left} left`;
     $("prog-bar").style.width = (100 * minted / ed).toFixed(1) + "%"; $("prog").hidden = false;
     $("h-live").textContent = sold ? "Sold out" : `● Live · ${minted} / ${ed} minted`;
+    const { freshMeta } = await import("./chain.js");   // TzKT can lag behind on new mints' metadata
     const late = latest.filter((t) => !(t.metadata || {}).name), got = await freshMeta(late.map((t) => t.tokenId));
     for (const t of late) t.metadata = got[t.tokenId] || t.metadata;
     $("latest").innerHTML = latest.map((t) => { const m = t.metadata || {}, uri = m.thumbnailUri || m.displayUri, img = ipfs(uri);
@@ -534,7 +539,7 @@ async function liveStatus() {
 }
 liveStatus(); setInterval(liveStatus, 60000);
 
-/* GIF maker: find the token's mint hash on chain (TzKT), redraw that exact cat with the
+/* GIF maker: the studio hands over a cat's seed (its mint hash); redraw that exact cat with the
    generator in a hidden frame, frame by frame through one loop of its song (16 beats, so
    the GIF loops seamlessly), and encode it in the browser with gif.js. Nothing is uploaded. */
 const B58 = "[1-9A-HJ-NP-Za-km-z]";
@@ -557,27 +562,16 @@ async function loadGifLib() {
 }
 const svgImage = (svg) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej;
   i.src = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" })); });
-$("gifform").onsubmit = async (e) => {
-  e.preventDefault();
-  const note = (t) => { $("gifnote").textContent = t; }, ref = parseRef($("gifref").value);
-  if (!ref) { note("Paste a Prancer link from Aleatory or objkt, its mint hash (starts with “o”), or its number like #12."); return; }
-  $("gifgo").disabled = true; $("gifdl").hidden = true; $("gifbarw").hidden = false; $("gifbar").style.width = "0";
+let gifBusy = false;
+async function makeGif(seed, name) {
+  if (gifBusy) return; gifBusy = true;
+  const note = (t) => { $("gifnote").textContent = t; };
+  $("gifgo").disabled = true; $("gifa").hidden = true; $("gifbarw").hidden = false; $("gifbar").style.width = "0";
   try {
-    let seed = ref.seed, name = "Prancer";
-    if (!seed) {
-      note("Finding your Prancer on chain…");
-      const t = await (await fetch(`${API}tokens?contract=${KT}&tokenId=${ref.tokenId}&select=tokenId,metadata`)).json();
-      if (!t.length) throw new Error("No Prancer with that number has been minted yet.");
-      seed = t[0].metadata && t[0].metadata.aleaSeed;
-      const m = seed ? t[0].metadata : (await freshMeta([ref.tokenId]))[ref.tokenId] || {};   // TzKT may not have read it yet
-      seed = m.aleaSeed;
-      if (!seed) throw new Error("Couldn't reach the chain just now. Try again in a moment.");
-      name = m.name || `Prancers #${num(t[0].tokenId) + 1}`;
-    }
     note("Drawing your cat…"); await loadGifLib();
     const fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;left:-4000px;top:0;width:600px;height:600px;border:0"; fr.setAttribute("aria-hidden", "true");
     document.body.appendChild(fr); await new Promise((r) => { fr.onload = r; fr.src = `${CONFIG.generator}?seed=${encodeURIComponent(seed)}`; });
-    const W = fr.contentWindow, P = W.__prancer; if (ref.seed) name = W.$alea._features.Name;
+    const W = fr.contentWindow, P = W.__prancer; name = name || W.$alea._features.Name;
     const size = +$("gifsize").value, FPS = 10, LT = P.LOOP * P.BEAT, N = Math.round(LT * FPS), t0 = Math.ceil(P.START / LT) * LT;
     const svg = W.document.querySelector("svg"), cv = document.createElement("canvas"); cv.width = cv.height = size; const cx = cv.getContext("2d");
     const gif = new GIF({ workers: 2, quality: 10, width: size, height: size, workerScript: gifLib, repeat: 0 });
@@ -594,84 +588,138 @@ $("gifform").onsubmit = async (e) => {
     const blob = await new Promise((res) => { gif.on("finished", res); gif.render(); });
     const url = URL.createObjectURL(blob), slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), file = (slug.startsWith("prancers") ? slug : "prancers-" + slug) + ".gif";
     $("gifout").innerHTML = ""; const im = new Image(); im.src = url; im.alt = name; $("gifout").appendChild(im);
-    $("gifa").href = url; $("gifa").download = file; $("gifdl").hidden = false;
+    $("gifa").href = url; $("gifa").download = file; $("gifa").hidden = false;
     const mb = blob.size / 1048576;
     note(`${name} · ${mb.toFixed(1)} MB · one seamless loop` + (mb > 10 ? " · over Discord's 10 MB limit, so try a smaller size for Discord" : ""));
   } catch (err) { note(err.message || "Something went wrong making the GIF. Please try again."); }
-  $("gifgo").disabled = false; $("gifbarw").hidden = true;
-};
+  $("gifgo").disabled = false; $("gifbarw").hidden = true; gifBusy = false;
+}
 </script>
 
 <script type="module">
-/* Desk Prancers. A teaser cat lives in the stage for everyone; holders connect and
-   let their own cats out along the bottom of this window, or into a small
-   always-on-top window (Document Picture-in-Picture, Chrome and Edge) that
-   stays over whatever else they're doing. The behaviour is all desk.js. */
+/* Your Prancers. me.js knows who you are (connect once, read-only, or paste an address; it's
+   remembered on this browser), and every tool here works on the cat you pick from the shelf:
+   its traits, a GIF, Desk Prancers (your own cats only) and the Parade. Anyone can add any
+   Prancer to the shelf as a visitor, by number, link or mint hash. */
 import { Desk } from "./desk.js";
-import { lookup, clear } from "./address.js";
-import { connectReadOnly, disconnectWallet } from "./connect.js";
+import { me, who, connectForm, mountChip } from "./me.js";
+import { tokenCat, randomCat } from "./chain.js";
+const chip = mountChip($("me"));
 const MAX = 6;
 if (innerWidth < 600) $("d-size").value = "80";                                 // phones: small cats
-let mine = [], chosen = new Set(), floor = null, pip = null, home = null;
+let visitors = [], focus = "", picked = false, chosen = new Set(), stray = null, floor = null, pip = null, home = null, pen = null;
+const key = (c) => (c.id != null ? "t" + c.id : "s" + c.seed);
+const own = () => me().cats.filter((c) => c.seed);
+const all = () => { const o = own(), k = new Set(o.map(key)); return [...o, ...visitors.filter((v) => !k.has(key(v)))]; };
+const label = (c) => (c.n ? `#${c.n} · ` : "") + (c.name || "A Prancer");
 
-/* the teaser: a random minted cat, living in the stage box. One request (TzKT rate-limits the page's
-   opening burst), and retried a few times. */
-(async () => {
-  for (let tries = 0; tries < 4; tries++) {
-    try {
-      const all = await fetch(`${API}tokens?contract=${KT}&metadata.aleaSeed.null=false&limit=500&select=metadata.aleaSeed,metadata.name`).then((r) => { if (!r.ok) throw 0; return r.json(); });
-      const t = all[Math.floor(Math.random() * all.length)]; if (!t) return;
-      const name = t["metadata.name"] || "", d = new Desk($("stage"), { size: 120, floor: 44 }), c = await d.add(t["metadata.aleaSeed"], { name: name.replace(/^Prancers #\d+ · /, "") });
-      $("stagewho").textContent = name.replace(/^Prancers /, "") + " · " + c.I.temperament; return;
-    } catch (e) { await new Promise((r) => setTimeout(r, 2500 * (tries + 1))); }
-  }
-})();
+/* portraits for cats without a cover (a visitor looked up by its hash): drawn once by the generator */
+const painter = document.createElement("iframe"); painter.setAttribute("aria-hidden", "true"); painter.tabIndex = -1;
+painter.style.cssText = "position:fixed;left:-4000px;top:0;width:400px;height:400px;border:0"; document.body.appendChild(painter);
+let paintQ = Promise.resolve();
+const portrait = (c) => (paintQ = paintQ.then(() => new Promise((res) => { painter.onload = () => { try {
+  const w = painter.contentWindow, P = w.__prancer, x = w.$alea._features; if (P) P.draw(P.START);
+  let svg = w.document.querySelector("svg").outerHTML; if (!/xmlns=/.test(svg)) svg = svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+  c.thumb = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); c.name = c.name || x.Name; c.temp = c.temp || x.Temperament;
+} catch (e) {} painter.src = "about:blank"; res(); }; painter.src = `${CONFIG.generator}?seed=${encodeURIComponent(c.seed)}`; })).then(shelf));
 
-const label = (t) => (t["token.metadata"].name || "").replace(/^Prancers /, "");
-function renderMine() {
-  $("d-cats").innerHTML = mine.map((t, i) => { const m = t["token.metadata"], uri = m.thumbnailUri || m.displayUri;
-    return `<button class="deskcat" type="button" data-i="${i}" aria-pressed="${chosen.has(i)}" ${m.aleaSeed ? "" : "disabled title='still rendering'"}>` +
-      (ipfs(uri) ? `<img src="${esc(ipfs(uri))}" alt="" loading="lazy">` : '<span class="ph"></span>') + `${esc(label(t))}</button>`; }).join("");
-  $("d-cats").querySelectorAll("[data-i]").forEach((b) => { b.onclick = () => { const i = +b.dataset.i;
-    if (chosen.has(i)) chosen.delete(i); else if (chosen.size < MAX) chosen.add(i); else { $("d-note").textContent = `Up to ${MAX} at once.`; return; }
-    b.setAttribute("aria-pressed", chosen.has(i)); $("d-out").disabled = $("d-pip").disabled = !chosen.size; }; });
+/* ---- the shelf ---- */
+function shelf() {
+  const S = me(), cats = all(), el = $("shelf");
+  $("y-kick").textContent = S.address ? `Your Prancers · ${who()}` : "Your Prancers";
+  $("y-title").textContent = own().length ? (own().length > 1 ? "Your cats, ready." : "Your cat, ready.") : "Bring your cats.";
+  $("y-lede").textContent = own().length ? `Pick a cat to see its traits and rarity or make a GIF of it, let ${own().length > 1 ? "them" : "it"} out onto your screen, or find ${own().length > 1 ? "them" : "it"} in the Parade.`
+    : "Connect once and your Prancers follow you around the site: pick one to see its traits and rarity or make a GIF of it, let them out onto your screen, or find them in the Parade.";
+  let h = "";
+  if (S.status === "none" || S.status === "error") h += `<div class="pc hello"><h3>Connect once</h3><p>${S.status === "error" ? esc(S.note) : "Your Prancers show up here and in every tool on the site, the Parade too."}</p><div data-cf></div></div>`;
+  else if (S.status === "loading") h += `<div class="pc hello"><h3>Finding your cats…</h3><p>${esc(who())}</p></div>`;
+  else if (!own().length) h += `<div class="pc hello"><h3>No Prancers here yet</h3><p>${esc(who())} doesn't hold a Prancer. <a href="#mint">Adopt one</a>, or look any Prancer up on the right.</p></div>`;
+  h += cats.map((c) => `<button type="button" class="pc" data-k="${esc(key(c))}" aria-pressed="${key(c) === focus}">` +
+    `<span class="im">${c.thumb ? `<img src="${esc(c.thumb)}" alt="" loading="lazy">` : ""}</span><b>${esc(label(c))}</b><small>${esc(c.temp || " ")}</small>` +
+    (c.visiting ? `<span class="vis">visiting</span><span class="rm" role="button" aria-label="Remove ${esc(c.name || "this cat")}" data-rm="${esc(key(c))}">×</span>` : "") + "</button>").join("");
+  h += `<form class="pc add" id="addcat"><p>Any Prancer: its number, its Aleatory or objkt link, or its mint hash.</p><input id="addref" placeholder="#12" spellcheck="false" autocomplete="off" aria-label="A Prancer's number, link or mint hash"><button class="btn ghost" type="submit">Add to shelf</button><p id="addnote" aria-live="polite"></p></form>`;
+  el.innerHTML = h;
+  const cf = el.querySelector("[data-cf]"); if (cf) connectForm(cf, { compact: true });
+  el.querySelectorAll("[data-k]").forEach((b) => { b.onclick = (e) => {
+    const rm = e.target.closest("[data-rm]"); if (rm) { visitors = visitors.filter((v) => key(v) !== rm.dataset.rm); if (focus === rm.dataset.rm) pick(all()[0], false); else shelf(); return; }
+    picked = true; pick(cats.find((c) => key(c) === b.dataset.k)); }; });
+  $("addcat").onsubmit = (e) => { e.preventDefault(); addRef($("addref").value); };
+  deskPanel(); paradePanel();
 }
-async function loadMine(a) {
-  if (!a) { mine = []; chosen.clear(); $("d-cats").innerHTML = ""; $("d-ctl").hidden = true; $("d-pick").hidden = false; $("d-found").hidden = true; $("d-who").textContent = ""; $("d-note").textContent = "Paste the address that holds your Prancers."; return; }
-  $("d-pick").hidden = true; $("d-found").hidden = false;
-  $("d-who").textContent = a.slice(0, 6) + "…" + a.slice(-4); $("d-note").textContent = "Finding your cats…";
-  mine = await fetch(`${API}tokens/balances?account=${a}&token.contract=${KT}&balance.gt=0&limit=300&select=token.tokenId,token.metadata`).then((r) => r.json()).catch(() => []);
-  mine.sort((x, y) => x["token.tokenId"] - y["token.tokenId"]);
-  const fresh = mine.filter((t) => !(t["token.metadata"] || {}).aleaSeed);   // not yet resolved by TzKT
-  if (fresh.length) { const got = await freshMeta(fresh.map((t) => t["token.tokenId"]));
-    for (const t of fresh) { const m = got[t["token.tokenId"]] || {}; t["token.metadata"] = { ...m, name: m.name || `Prancers #${num(t["token.tokenId"]) + 1}` }; } }
-  if (!mine.length) { $("d-note").innerHTML = 'Desk Prancers are for holders, and this address has no Prancers yet. <a href="#mint">Adopt one</a> and come back.'; $("d-ctl").hidden = true; return; }
-  chosen = new Set(mine.map((t, i) => i).filter((i) => mine[i]["token.metadata"].aleaSeed).slice(0, 4));
-  $("d-note").textContent = mine.length > 1 ? `Pick who comes out (up to ${MAX}).` : "Ready when you are.";
-  renderMine(); $("d-ctl").hidden = false; $("d-out").disabled = $("d-pip").disabled = !chosen.size;
-  $("d-pipnote").textContent = "documentPictureInPicture" in window ? "Pop out keeps them in a small window on top of everything else while you work." : "Pop out works in Chrome and Edge on a computer.";
-  if (!("documentPictureInPicture" in window)) $("d-pip").hidden = true;
+async function addRef(v) {
+  const note = (t) => { const n = $("addnote"); if (n) n.textContent = t; }, ref = parseRef(v);
+  if (!ref) { note("Try #12, a link, or a hash starting with “o”."); return; }
+  let c;
+  if (ref.seed) c = { seed: ref.seed, name: "", thumb: "", temp: "" };
+  else { note("Finding it on chain…"); try { c = await tokenCat(ref.tokenId); } catch (e) { note("Couldn't reach the chain just now."); return; }
+    if (!c) { note("No Prancer with that number has been minted yet."); return; }
+    if (!c.seed) { note("Couldn't read that one just now. Try again in a moment."); return; } }
+  if (!all().some((o) => key(o) === key(c))) visitors.push({ ...c, visiting: true });
+  picked = true; pick(all().find((o) => key(o) === key(c)));
+  if (!c.thumb) portrait(all().find((o) => key(o) === key(c)));
+  $("shelf").scrollTo({ left: $("shelf").scrollWidth, behavior: "smooth" });
 }
-addEventListener("address:change", (e) => loadMine(e.detail).catch(() => { $("d-note").textContent = "Couldn't read your Prancers just now. Please try again."; }));
-$("d-disconnect").onclick = () => { bringHome(); clear(); disconnectWallet(); $("d-addr").value = ""; };
-$("d-connect").onclick = async () => {
-  $("d-note").textContent = "Opening your wallet… it will only be asked for your address.";   // (no disabling: closing the picker doesn't report back, and a second click reuses the same request)
-  try { await lookup(await connectReadOnly()); }
-  catch (e) { $("d-note").textContent = /abort|reject|cancel|closed/i.test(String(e && (e.message || e.errorType || e))) ? "Not connected. You can paste your address instead." : "Your wallet didn't connect read-only, so we stopped there. Paste your address instead."; }
-};
-$("d-watch").onsubmit = async (e) => { e.preventDefault(); try { $("d-note").textContent = "Looking up…"; await lookup($("d-addr").value); } catch (err) { $("d-note").textContent = err.message || "Couldn't find that address."; } };
 
-const picks = () => [...chosen].map((i) => mine[i]).filter((t) => t["token.metadata"].aleaSeed);
+/* ---- the stage: the picked cat, live; its features fill the trait card ---- */
+const stage = $("y-stage");
+let stageSeen = true;
+const stagePause = () => { try { stage.contentWindow.__paused = !stageSeen; } catch (e) {} };
+new IntersectionObserver(([e]) => { stageSeen = e.isIntersecting; stagePause(); }).observe(stage);
+function pick(c, user = true) {
+  if (!c) return;
+  const k = key(c), same = k === focus; focus = k; shelf();
+  $("y-tag").innerHTML = `<b>${esc(label(c))}</b> · tap for sound`;
+  $("gifgo").textContent = `Make a GIF of ${c.name || "this cat"}`;
+  if (same) return;
+  $("card").innerHTML = '<p class="small">Waking the cat…</p>'; $("gifnote").textContent = ""; $("gifa").hidden = true; $("gifout").innerHTML = "<p>Your GIF appears here.</p>";
+  stage.src = `${CONFIG.generator}?seed=${encodeURIComponent(c.seed)}`;
+}
+stage.addEventListener("load", () => { stagePause(); const x = stage.contentWindow.$alea && stage.contentWindow.$alea._features; if (!x) return;
+  showTraits(x); const c = all().find((o) => key(o) === focus); if (c && !c.name) { c.name = x.Name; c.temp = x.Temperament; shelf(); } });
+const focused = () => all().find((o) => key(o) === focus);
+$("gifgo").onclick = () => { const c = focused(); if (c) makeGif(c.seed, c.n ? `Prancers #${c.n} · ${c.name}` : c.name); };
+
+/* ---- tabs ---- */
+const tabs = [...document.querySelectorAll("#yours [data-tab]")];
+const tab = (t) => { for (const b of tabs) b.setAttribute("aria-selected", b.dataset.tab === t); document.querySelectorAll("#yours [data-panel]").forEach((p) => { p.hidden = p.dataset.panel !== t; });
+  if (t === "desk") teaser(); };
+tabs.forEach((b) => { b.onclick = () => tab(b.dataset.tab); });
+document.addEventListener("click", (e) => { if (e.target.closest("[data-me]")) { e.preventDefault(); chip.open(true); } });
+
+/* hero → studio: "look closer" puts the hero's cat on the shelf as a visitor */
+document.addEventListener("click", (e) => { if (!e.target.closest("#closer") || !heroSeed) return;
+  const x = hero.contentWindow.$alea && hero.contentWindow.$alea._features, c = { seed: heroSeed, name: x ? x.Name : "", temp: x ? x.Temperament : "", thumb: "", visiting: true };
+  if (!all().some((o) => key(o) === key(c))) visitors.push(c); picked = true; pick(c); portrait(c); tab("traits"); });
+
+/* ---- Desk Prancers: your own cats only ---- */
+function deskPanel() {
+  const o = own(); $("d-own").hidden = !o.length; $("d-guest").hidden = !!o.length;
+  if (!o.length) return;
+  for (const id of [...chosen]) if (!o.some((c) => c.id === id)) chosen.delete(id);
+  if (!chosen.size) o.slice(0, 4).forEach((c) => chosen.add(c.id));
+  $("d-cats").innerHTML = o.map((c) => `<button class="deskcat" type="button" data-id="${c.id}" aria-pressed="${chosen.has(c.id)}">` +
+    (c.thumb ? `<img src="${esc(c.thumb)}" alt="" loading="lazy">` : '<span class="ph"></span>') + `${esc(label(c))}</button>`).join("");
+  $("d-cats").querySelectorAll("[data-id]").forEach((b) => { b.onclick = () => { const id = +b.dataset.id;
+    if (chosen.has(id)) chosen.delete(id); else if (chosen.size < MAX) chosen.add(id); else { $("d-pipnote").textContent = `Up to ${MAX} at once.`; return; }
+    b.setAttribute("aria-pressed", chosen.has(id)); $("d-out").disabled = $("d-pip").disabled = !chosen.size; }; });
+  $("d-out").disabled = $("d-pip").disabled = !chosen.size;
+  $("d-pipnote").textContent = "documentPictureInPicture" in window ? "Pop out keeps them in a small window on top of everything else while you work." : "";
+  $("d-pip").hidden = !("documentPictureInPicture" in window);
+}
+/* the teaser for visitors: one minted cat in a pen (made the first time the tab opens) */
+function teaser() { if (pen || !stray) return; pen = new Desk($("stage"), { size: 120, floor: 44 });
+  pen.add(stray.seed, { name: stray.name }).then((c) => { $("stagewho").textContent = label(stray) + " · " + c.I.temperament; }).catch(() => {}); }
+const picks = () => own().filter((c) => chosen.has(c.id));
 function bringHome() { if (floor) { floor.stop(); floor.root.remove(); floor = null; } if (home) { home.remove(); home = null; } removeEventListener("keydown", laserKey); $("d-out").textContent = "Let them out"; }
 const laserKey = (e) => { if (e.key === "Escape" && floor && floor.dot) { floor.laser(false); home.querySelector("[data-laser]").setAttribute("aria-pressed", "false"); } };
 $("d-out").onclick = () => {
   if (floor) { bringHome(); return; }
   const root = document.createElement("div"); root.id = "deskfloor"; document.body.appendChild(root);
   floor = new Desk(root, { size: +$("d-size").value, perch: true, treats: true });
-  for (const t of picks()) floor.add(t["token.metadata"].aleaSeed, { id: t["token.tokenId"], name: label(t).replace(/^#\d+ · /, "") });
+  for (const c of picks()) floor.add(c.seed, { id: c.id, name: c.name });
   /* the toy bar: a laser pointer to chase, a treat to share, and home */
   home = document.createElement("div"); home.id = "deskbar"; home.setAttribute("role", "toolbar"); home.setAttribute("aria-label", "Desk Prancers");
-  home.innerHTML = '<button type="button" data-laser aria-pressed="false" title="Laser pointer (Esc to stop)">🔴 Laser</button><button type="button" data-treat title="Drop a treat (or double-click anywhere)">🐟 Treat</button><button type="button" data-home title="Bring them home">🐾 Home</button>';
+  home.innerHTML = '<button type="button" data-laser aria-pressed="false" title="Laser pointer (Esc to stop)">🔴 Laser</button><button type="button" data-treat title="Drop a treat (or double-click anywhere)">🐟 Treat</button><button type="button" data-home title="Bring them home">🏠 Home</button>';
   home.querySelector("[data-laser]").onclick = (e) => e.currentTarget.setAttribute("aria-pressed", floor.laser(!floor.dot));
   home.querySelector("[data-treat]").onclick = () => floor.treat();
   home.querySelector("[data-home]").onclick = bringHome;
@@ -692,11 +740,31 @@ window.__deskWin = (w, size) => {
   d.body.style.cssText = "margin:0;height:100vh;overflow:hidden;background:linear-gradient(180deg,#150f1e 0 82%,#2a1640 82% 84%,#7a1e3c 84%);font:12px ui-monospace,Menlo,monospace";
   const root = d.createElement("div"); root.style.cssText = "position:fixed;inset:0"; d.body.appendChild(root);
   const desk = new Desk(root, { size, floor: Math.round(size * 0.12), treats: true });
-  for (const t of picks()) desk.add(t["token.metadata"].aleaSeed, { id: t["token.tokenId"], name: label(t).replace(/^#\d+ · /, "") });
+  for (const c of picks()) desk.add(c.seed, { id: c.id, name: c.name });
   w.addEventListener("pagehide", () => { desk.stop(); pip = null; $("d-pip").textContent = "Pop out window"; });
   if (w === pip) $("d-pip").textContent = "Close pop-out";
   return desk;
 };
+
+/* ---- the Parade ---- */
+const SECTION = { Regal: "Their Royal Highnesses", Confident: "The Confident Strutters", Sassy: "The Sass Squad", Playful: "The Zoomies Brigade", Curious: "The Curious Corps",
+  Sweet: "The Sweethearts", Shy: "The Shy Ones", Chill: "The Chill Collective", Grumpy: "The Grumpy Section" };   // as on the Parade page
+function paradePanel() {
+  const o = own(), c = focused();
+  $("y-parade").innerHTML = (o.length ? o : c ? [c] : []).filter((x) => x.n).map((x) => `<li><b>${esc(label(x))}</b><span>${esc(SECTION[x.temp] || "marching")}</span></li>`).join("");
+  $("y-parnote").textContent = o.length ? `Your ${o.length > 1 ? o.length + " cats get" : "cat gets"} a spotlight as ${o.length > 1 ? "they pass" : "it passes"}, and the Parade page counts down to each.` : "Connect once and the Parade page will find your cats for you.";
+}
+
+/* ---- you, arriving ---- */
+addEventListener("me:change", () => {
+  if (me().status === "none") { bringHome(); chosen.clear(); }
+  const o = own(); if (o.length) visitors = visitors.filter((v) => !v.auto);   // the stand-in visitor steps aside for your own cats
+  if (o.length && (!picked || !all().some((c) => key(c) === focus))) pick(o[0], false); else if (!focused() && all()[0]) pick(all()[0], false); else shelf();
+});
+shelf();
+/* before you connect: a minted cat visits, so the tools have someone to show */
+randomCat().then((c) => { if (!c) return; stray = c; if (!$("d-guest").hidden && !$("yours").querySelector('[data-panel="desk"]').hidden) teaser();
+  if (!own().length && !visitors.length) { visitors.push({ ...c, visiting: true, auto: true }); pick(visitors[0], false); } }).catch(() => {});
 </script>
 </body>
 </html>

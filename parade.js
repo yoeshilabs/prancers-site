@@ -9,10 +9,8 @@
    announced by a banner plane flying over as its first cats walk in. Each cat is
    its own pet build (pet.html?seed=…), drawn and stepped here; only the cats near the
    screen exist at any moment. */
-import { lookup, clear } from "./address.js";
-import { connectReadOnly, disconnectWallet } from "./connect.js";
-
-const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzkt.io/v1/";
+import { me, who, connectForm, mountChip } from "./me.js";
+import { KT, API, freshMeta } from "./chain.js";
 const PARADE_EPOCH = Date.UTC(2026, 9, 6);                 // the parade stepped off
 const $ = (id) => document.getElementById(id);
 const esc = (v) => String(v).replace(/[&<>"'`]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" })[c]);
@@ -51,33 +49,6 @@ const SECTIONS = [
   ["Shy", "The Shy Ones", "(hi)"], ["Chill", "The Chill Collective", "in no hurry whatsoever"], ["Grumpy", "The Grumpy Section", "attendance mandatory"],
 ];
 let slots = [], planes = [], LOOP = 1, mine = new Set();
-/* TzKT reads each token's metadata file from IPFS on its own schedule and can fall hours
-   behind (objkt runs its own indexer, so it doesn't). For a token TzKT hasn't resolved yet, the
-   site follows the contract's own token_metadata link and reads the file itself. If IPFS is slow
-   too, the seed is still on chain: it's the mint's operation hash, so the cat can be drawn anyway. */
-async function freshMeta(ids) {
-  const out = {}; if (!ids.length) return out;
-  const get = (u) => fetch(u, { signal: AbortSignal.timeout(8000) }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-  const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/, CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})$/;
-  try {
-    const keys = await get(`${API}contracts/${KT}/bigmaps/token_metadata/keys?${ids.length > 1 ? "key.in=" + ids.join(",") : "key=" + ids[0]}&select=key,value`);
-    await Promise.all(keys.map(async (k) => { try {
-      const hx = String((k.value && k.value.token_info && k.value.token_info[""]) || ""), uri = hx.replace(/[0-9a-f]{2}/g, (h) => String.fromCharCode(parseInt(h, 16)));
-      const cid = CID.exec(uri); if (!cid) return;
-      const m = await get("https://ipfs.fileship.xyz/" + cid[1]);
-      out[k.key] = { name: typeof m.name === "string" ? m.name : "", thumbnailUri: m.thumbnailUri, displayUri: m.displayUri,
-        attributes: Array.isArray(m.attributes) ? m.attributes : [], aleaSeed: SEED.test(m.aleaSeed || "") ? m.aleaSeed : undefined };
-    } catch (e) { /* this one falls back to its mint hash below */ } }));
-  } catch (e) { /* likewise */ }
-  const need = ids.filter((id) => !(out[id] && out[id].aleaSeed));
-  if (need.length) try {
-    const tr = await get(`${API}tokens/transfers?token.contract=${KT}&from.null=true&token.tokenId.in=${need.join(",")}&limit=1000&select=token.tokenId,transactionId`);
-    const ops = tr.length ? await get(`${API}operations/transactions?id.in=${tr.map((t) => t.transactionId).join(",")}&limit=1000&select=id,hash,target`) : [];
-    for (const t of tr) { const op = ops.find((o) => o.id === t.transactionId);
-      if (op && op.target && op.target.address === KT && SEED.test(op.hash)) out[t["token.tokenId"]] = { name: "", attributes: [], ...(out[t["token.tokenId"]] || {}), aleaSeed: op.hash }; }
-  } catch (e) { /* the cat waits for TzKT */ }
-  return out;
-}
 async function lineUp() {
   const [tokens, rarity] = await Promise.all([
     fetch(`${API}tokens?contract=${KT}&limit=1000&select=tokenId,metadata`).then((r) => r.json()),
@@ -230,19 +201,21 @@ function lists() {
   $("p-next").innerHTML = catSlots.map((s) => [s, when(s)]).filter(([, t]) => t > 0).sort((a, b) => a[1] - b[1]).slice(0, 5)
     .map(([s, t]) => `<li><b>#${s.cat.n} · ${esc(s.cat.name)}</b><span>${fmt(t)}</span></li>`).join("");
 }
-async function loadMine(a) {
-  if (!a) { mine = new Set(); $("p-mine").innerHTML = ""; $("p-note").textContent = "Connecting only shares your address; nothing to sign."; return; }
-  $("p-note").textContent = "Finding your cats…";
-  const held = await fetch(`${API}tokens/balances?account=${a}&token.contract=${KT}&balance.gt=0&limit=1000&select=token.tokenId`).then((r) => r.json()).catch(() => []);
-  mine = new Set(held.map((x) => Number(x)));
-  $("p-note").innerHTML = mine.size ? `${mine.size} of your Prancers ${mine.size > 1 ? "are" : "is"} in the parade. <a href="#" id="p-change">Change address</a>` : 'No Prancers at this address yet. <a href="index.html#mint">Adopt one</a> and it joins the parade.';
-  const ch = document.getElementById("p-change"); if (ch) ch.onclick = (e) => { e.preventDefault(); clear(); disconnectWallet(); };
+/* you, from me.js: connect once on any page and the parade knows your cats */
+mountChip($("me"), { home: "index.html#yours" });
+function loadMine() {
+  const S = me();
+  mine = new Set(S.status === "ready" ? S.cats.map((c) => c.id) : []);
+  $("p-kick").textContent = S.address ? `Your cats · ${who()}` : "Your cats";
+  $("p-connect").hidden = S.status !== "none" && S.status !== "error";
+  if (!$("p-connect").hidden && !$("p-connect").firstChild) connectForm($("p-connect"));
+  if ($("p-connect").hidden) $("p-connect").innerHTML = "";
+  $("p-note").innerHTML = S.status === "loading" ? "Finding your cats…" : S.status === "error" ? esc(S.note)
+    : S.status === "none" ? "" : mine.size ? `${mine.size} of your Prancers ${mine.size > 1 ? "are" : "is"} in the parade.`
+    : 'No Prancers at this address yet. <a href="index.html#mint">Adopt one</a> and it joins the parade.';
   lists();
 }
-addEventListener("address:change", (e) => loadMine(e.detail));
-$("p-watch").onsubmit = async (e) => { e.preventDefault(); try { $("p-note").textContent = "Looking up…"; await lookup($("p-addr").value); } catch (err) { $("p-note").textContent = err.message || "Couldn't find that address."; } };
-$("p-connect").onclick = async () => { $("p-note").textContent = "Opening your wallet… it will only be asked for your address.";
-  try { await lookup(await connectReadOnly()); } catch (e) { $("p-note").textContent = "Not connected. You can paste your address instead."; } };
+addEventListener("me:change", loadMine); loadMine();
 
 /* a hook for the reel-capture tools, on localhost only: where everything is, from the same clock */
 if (location.hostname === "localhost") window.__parade = { get slots() { return slots; }, get planes() { return planes; }, get LOOP() { return LOOP; },
