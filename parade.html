@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Prancer Parade</title>
+<meta name="description" content="The Prancer Parade: every minted Prancer marching on the beat, all day, the same parade for everyone watching. Find your cats and cheer them on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0e0a14; --panel: #1b1426; --line: #2e2440; --ink: #f6effa; --mute: #b8accb; --dim: #8a7f9c; --neon: #ff5fa2; --neon-soft: rgba(255, 95, 162, .55); --gold: #ffc85f;
+    --display: "League Gothic", "Arial Narrow", sans-serif; --mono: "Space Mono", ui-monospace, Menlo, monospace; --body: ui-sans-serif, system-ui, -apple-system, sans-serif; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+  a { color: inherit; }
+  [hidden] { display: none !important; }
+  .top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 18px; padding: 10px 20px; background: rgba(14, 10, 20, .82); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .top .brand { font: 32px/1 var(--display); text-decoration: none; letter-spacing: .03em; text-shadow: 0 0 14px var(--neon-soft); }
+  .top .back { margin-left: auto; font: 12px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); text-decoration: none; }
+  .top .back:hover { color: var(--ink); }
+  .btn { font: 700 13px var(--mono); text-transform: uppercase; letter-spacing: .05em; border-radius: 999px; padding: 10px 16px; border: 0; cursor: pointer; background: var(--neon); color: #1a0610; box-shadow: 0 0 16px var(--neon-soft); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+  .btn:disabled { opacity: .45; cursor: default; }
+
+  /* ---- the street ---- */
+  #street { position: relative; height: min(78vh, 720px); min-height: 460px; overflow: hidden; cursor: pointer; user-select: none;
+    background: linear-gradient(180deg, #120a1f 0%, #1d1030 46%, #2a1238 62%, #160d22 63%, #1a1026 100%); }
+  #street .sky { position: absolute; inset: 0 0 37% 0; background:
+      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255, 95, 162, .18), transparent 70%),
+      radial-gradient(1px 1px at 12% 18%, #fff8, transparent), radial-gradient(1px 1px at 33% 9%, #fff6, transparent), radial-gradient(1px 1px at 58% 22%, #fff7, transparent),
+      radial-gradient(1px 1px at 79% 12%, #fff6, transparent), radial-gradient(1px 1px at 91% 28%, #fff5, transparent); }
+  #street svg.skyline { position: absolute; left: 0; right: 0; bottom: 37%; width: 100%; height: 34%; }
+  /* the road: a red carpet with gold edges, in perspective-ish bands */
+  #street .road { position: absolute; left: 0; right: 0; top: 63%; height: 22%;
+    background: linear-gradient(180deg, #5a1630 0%, #7a1e3c 30%, #8d2446 100%); border-top: 3px solid var(--gold); border-bottom: 3px solid var(--gold); box-shadow: 0 -6px 30px rgba(255, 200, 95, .15); }
+  #street .road::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 200, 95, .18) 46px 50px); }
+  /* bunting and lights strung across the top */
+  #street .bunting { position: absolute; left: 0; right: 0; top: 0; height: 90px; pointer-events: none; }
+  #street .sign-main { position: absolute; left: 50%; top: 4%; transform: translateX(-50%); text-align: center; pointer-events: none; white-space: nowrap; }
+  #street .sign-main b { display: block; font: clamp(44px, 7vw, 92px)/.9 var(--display); letter-spacing: .03em; color: #fff; text-transform: uppercase;
+    text-shadow: 0 0 10px var(--neon), 0 0 30px var(--neon), 0 0 60px var(--neon-soft); }
+  #street .sign-main span { display: block; margin-top: 6px; font: 700 clamp(11px, 1.4vw, 14px) var(--mono); letter-spacing: .3em; text-transform: uppercase; color: var(--gold); text-shadow: 0 0 10px rgba(255, 200, 95, .6); }
+  #lane { position: absolute; inset: 0; pointer-events: none; }
+  #lane iframe { position: absolute; left: 0; top: 0; border: 0; background: transparent; color-scheme: normal; pointer-events: none; }
+  .sash { position: absolute; left: 0; top: 0; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: rgba(14, 10, 20, .82); border: 1px solid var(--line);
+    font: 700 11px/1.3 var(--mono); color: var(--ink); white-space: nowrap; pointer-events: none; }
+  .sash.mine { border-color: var(--neon); box-shadow: 0 0 12px var(--neon-soft); }
+  .sash.gold { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(255, 200, 95, .5); }
+  /* banner planes */
+  #sky-lane { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .plane { position: absolute; left: 0; top: 0; display: flex; align-items: center; white-space: nowrap; filter: drop-shadow(0 0 10px rgba(255, 95, 162, .45)); }
+  .plane svg { flex: none; }
+  .plane .prop { transform-origin: 9.5px 27px; animation: prop .12s linear infinite; }
+  @keyframes prop { 50% { transform: scaleY(.15); } }
+  .plane .rope { flex: none; width: 46px; height: 2px; background: repeating-linear-gradient(90deg, #c9bfd6 0 6px, transparent 6px 9px); }
+  .plane .flag { position: relative; padding: 8px 22px 9px 18px; background: linear-gradient(180deg, #2a1640, #1b1426); border: 2px solid var(--neon); border-radius: 4px 14px 14px 4px;
+    box-shadow: 0 0 18px var(--neon-soft), inset 0 0 12px rgba(255, 95, 162, .18); animation: flap 1s ease-in-out infinite; transform-origin: 0 50%; }
+  @keyframes flap { 50% { transform: skewY(1.5deg) scaleY(.97); } }
+  .plane .flag b { display: block; font: clamp(20px, 2.4vw, 30px)/1 var(--display); letter-spacing: .04em; text-transform: uppercase; color: #fff; }
+  .plane .flag span { display: block; margin-top: 3px; font: 700 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+  .plane.gold { filter: drop-shadow(0 0 12px rgba(255, 200, 95, .55)); }
+  .plane.gold .flag { border-color: var(--gold); box-shadow: 0 0 18px rgba(255, 200, 95, .5), inset 0 0 12px rgba(255, 200, 95, .18); }
+  .plane.gold .flag b { color: var(--gold); }
+  @media (prefers-reduced-motion: reduce) { .plane .prop, .plane .flag { animation: none; } }
+  .spot { position: absolute; top: 0; width: 360px; transform: translateX(-50%); pointer-events: none;
+    background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(255, 240, 200, .32), rgba(255, 220, 160, .08) 60%, transparent 75%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); mix-blend-mode: screen; }
+  .banner { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); padding: 4px 12px; border-radius: 8px; background: var(--neon); color: #1a0610;
+    font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 0 18px var(--neon-soft); pointer-events: none; }
+  /* the crowd: cat-eared heads along the front, bobbing to the march */
+  #crowd { position: absolute; left: 0; right: 0; bottom: 0; height: 15%; pointer-events: none; }
+  #crowd svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
+  #crowd .row { transform-origin: 50% 100%; }
+  #confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #sound { position: absolute; right: 16px; top: 16px; z-index: 5; }
+  .sash { overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 600px) { #street { height: 540px; min-height: 0; } #sound { top: auto; bottom: 14px; right: 12px; } .sash { font-size: 10px; } }
+
+  /* ---- below the street ---- */
+  main { width: min(1160px, 100% - 32px); margin: 0 auto; padding: 28px 0 60px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .kicker { font: 700 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--neon); }
+  h2 { font: 44px/1 var(--display); letter-spacing: .02em; text-transform: uppercase; margin: 8px 0 12px; }
+  p { color: var(--mute); margin: 8px 0; }
+  .note { font: 13px/1.5 var(--mono); color: var(--mute); }
+  form.lookup { display: flex; gap: 8px; margin-top: 12px; }
+  form.lookup input { flex: 1; min-width: 0; font: 14px var(--mono); background: #0c0812; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+  ul.list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+  ul.list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(0, 0, 0, .25); border: 1px solid var(--line); font: 13px var(--mono); }
+  ul.list li b { color: var(--ink); }
+  ul.list li span { color: var(--gold); white-space: nowrap; }
+  ul.list li.now { border-color: var(--neon); box-shadow: 0 0 12px var(--neon-soft); }
+  ul.list li.now span { color: var(--neon); }
+  @media (prefers-reduced-motion: reduce) { #crowd .row { animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="top"><a class="brand" href="index.html">PRANCERS</a><a class="back" href="index.html#desk">← Back to the site</a></div>
+
+<section id="street" aria-label="The Prancer Parade, live">
+  <div class="sky"></div>
+  <svg class="skyline" viewBox="0 0 1200 240" preserveAspectRatio="none" aria-hidden="true" id="skyline"></svg>
+  <svg class="bunting" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true" id="bunting"></svg>
+  <div id="sky-lane"></div>
+  <div class="sign-main"><b>The Prancer Parade</b><span>Every Prancer · on the beat · all day</span></div>
+  <div class="road"></div>
+  <div id="lane"></div>
+  <div id="crowd"><svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true" id="crowdsvg"></svg></div>
+  <canvas id="confetti"></canvas>
+  <button class="btn ghost" id="sound" type="button" aria-pressed="false">🔊 Play the march</button>
+</section>
+
+<main>
+  <div class="card">
+    <div class="kicker">Find your cats</div>
+    <h2>Your Prancers, marching.</h2>
+    <p>The parade never stops: every minted Prancer, in order, on a loop, and everyone watching sees the same parade at the same moment. Find your cats to see when they march past, and they'll get a spotlight when they do.</p>
+    <div class="row"><button class="btn" id="p-connect" type="button">Connect wallet · read-only</button></div>
+    <form class="lookup" id="p-watch"><input id="p-addr" placeholder="or paste your address · name.tez" spellcheck="false" autocomplete="off" aria-label="Your Tezos address or .tez name"><button class="btn ghost" type="submit">Find</button></form>
+    <p class="note" id="p-note" aria-live="polite">Connecting only shares your address; nothing to sign.</p>
+    <ul class="list" id="p-mine"></ul>
+  </div>
+  <div class="card">
+    <div class="kicker">Up next</div>
+    <h2>Coming down the street.</h2>
+    <p>Tap a cat to cheer it on (it reacts in its own way). Tap the street for confetti.</p>
+    <ul class="list" id="p-next"></ul>
+    <p class="note" id="p-count"></p>
+  </div>
+</main>
+
+<audio id="march" src="parade-march.m4a" preload="none" loop></audio>
+<script type="module" src="parade.js"></script>
+</body>
+</html>
