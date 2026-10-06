@@ -73,7 +73,8 @@
   #confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   #sound { position: absolute; right: 16px; top: 16px; z-index: 5; }
   .sash { overflow: hidden; text-overflow: ellipsis; }
-  @media (max-width: 600px) { #street { height: 540px; min-height: 0; } #sound { top: auto; bottom: 14px; right: 12px; } .sash { font-size: 10px; } }
+  @media (max-width: 900px) { #sound { top: auto; bottom: 14px; right: 12px; } }
+  @media (max-width: 600px) { #street { height: 540px; min-height: 0; } .sash { font-size: 10px; } }
 
   /* ---- below the street ---- */
   main { width: min(1160px, 100% - 32px); margin: 0 auto; padding: 28px 0 60px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
