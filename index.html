@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-55AyqnRPSl5gjfhCCgGhFV7MCKMb81pifrTygRYhua0=' 'sha256-uX5T4PNcwBU2d+jtv/syHlg8DeKMd1v/uc+LmnBRC94='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-txS0n76AfnfTBeqL2eOaB7mJpHnFymm2qW25+TTCwuI=' 'sha256-uX5T4PNcwBU2d+jtv/syHlg8DeKMd1v/uc+LmnBRC94='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,15 +229,16 @@
   .credits li { margin-bottom: 8px; }
 
   /* the rug: you walk out across it */
-  .rug { height: 110px; margin-top: 24px; background:
-      repeating-linear-gradient(90deg, transparent 0 36px, rgba(255, 200, 95, .55) 36px 40px, transparent 40px 76px),
-      linear-gradient(180deg, #2a1640 0 16px, #ffc85f 16px 20px, #7a1e3c 20px 90px, #ffc85f 90px 94px, #2a1640 94px);
-    background-size: 76px 100%, 100% 100%; animation: walk 2s linear infinite; border-top: 1px solid var(--line); }
-  @keyframes walk { to { background-position: -76px 0, 0 0; } }
+  /* the rug slides on the compositor (a transform), so it never repaints */
+  .rug { position: relative; height: 110px; margin-top: 24px; overflow: hidden; border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, #2a1640 0 16px, #ffc85f 16px 20px, #7a1e3c 20px 90px, #ffc85f 90px 94px, #2a1640 94px); }
+  .rug::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% + 76px); will-change: transform;
+    background: repeating-linear-gradient(90deg, transparent 0 36px, rgba(255, 200, 95, .55) 36px 40px, transparent 40px 76px); animation: walk 2s linear infinite; }
+  @keyframes walk { to { transform: translateX(-76px); } }
   footer { padding: 26px 0 40px; font: 12px var(--mono); color: var(--dim); }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 
-  @media (prefers-reduced-motion: reduce) { .rug, .skeleton { animation: none; } .frame, .btn { transition: none; } html { scroll-behavior: auto; } }
+  @media (prefers-reduced-motion: reduce) { .rug::before, .skeleton { animation: none; } .frame, .btn { transition: none; } html { scroll-behavior: auto; } }
 </style>
 </head>
 <body>
@@ -398,6 +399,11 @@ $("m-edition").textContent = CONFIG.edition; $("m-price").textContent = CONFIG.p
 
 /* hero: one live cat */
 const hero = $("hero");
+/* the hero cat only draws while it's on screen (the site's build draws at most 30 fps, and stops while __paused) */
+let heroSeen = true;
+const heroPause = () => { try { hero.contentWindow.__paused = !heroSeen; } catch (e) {} };
+new IntersectionObserver(([e]) => { heroSeen = e.isIntersecting; heroPause(); }).observe(hero);
+hero.addEventListener("load", heroPause);
 function showCat(s) {
   $("h-title").textContent = "Waking a cat…"; $("h-genes").textContent = "";
   hero.src = `${CONFIG.generator}?seed=${s}`;
@@ -463,6 +469,7 @@ async function hangWall() {
     slot.setAttribute("aria-label", `Bring ${x.Name} to life`);
     slot.onclick = () => { showCat(s); $("top").scrollIntoView(); };
   }
+  scout.src = "about:blank";   // the painter's done: don't leave a hidden cat animating forever
 }
 $("rehang").onclick = hangWall;
 hangWall();

@@ -96,8 +96,11 @@ function spawn(i) {
 function size(o) { const I = o.I, k = SIZE / (I.box[3] * 0.62); o.k = k; o.W = I.box[2] * k; o.H = I.box[3] * k; o.f.style.width = o.W + "px"; o.f.style.height = o.H + "px"; }
 function drop(i) { const o = live.get(i); for (const k of ["el", "f", "sash", "spot", "banner"]) if (o[k]) o[k].remove(); live.delete(i); }
 
-let last = performance.now();
+/* kind to laptops: at most ~30 frames a second, and nothing while the street is scrolled out of view */
+let last = performance.now(), streetSeen = true;
+new IntersectionObserver(([e]) => { streetSeen = e.isIntersecting; }).observe(street);
 function tick(now) {
+  if (!streetSeen || now - last < 31) { if (!streetSeen) last = now; requestAnimationFrame(tick); return; }
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (slots.length) {
     const h = head(), W = street.clientWidth;
@@ -157,7 +160,9 @@ fit(); addEventListener("resize", () => { fit(); measure(); for (const o of live
 function burst(x, y, n = 40) { const C = ["#ff5fa2", "#ffc85f", "#7be3c7", "#9b8cff", "#ffffff"];
   for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 180 + Math.random() * 320;
     bits.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 12, c: C[i % C.length], s: 4 + Math.random() * 5, life: 2.2 }); } }
-function confetti(dt) { cx.clearRect(0, 0, cv.width, cv.height); bits = bits.filter((b) => (b.life -= dt) > 0);
+let wasConfetti = false;
+function confetti(dt) { if (!bits.length && !wasConfetti) return; wasConfetti = bits.length > 0;   // an empty sky costs nothing
+  cx.clearRect(0, 0, cv.width, cv.height); bits = bits.filter((b) => (b.life -= dt) > 0);
   for (const b of bits) { b.vy += 520 * dt; b.vx *= 0.99; b.x += b.vx * dt; b.y += b.vy * dt; b.r += b.vr * dt;
     cx.save(); cx.globalAlpha = Math.min(1, b.life); cx.translate(b.x, b.y); cx.rotate(b.r); cx.fillStyle = b.c; cx.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2); cx.restore(); } }
 

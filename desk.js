@@ -71,7 +71,14 @@ export class Desk {
     this.doc.documentElement.addEventListener("pointerleave", this._leave); W.addEventListener("scroll", this._scroll, { passive: true });
     if (treats) W.addEventListener("dblclick", this._dbl);
     let last = performance.now();
-    const loop = (now) => { if (!this.running) return; const dt = Math.min(0.1, (now - last) / 1000); last = now; this._tick(dt, now); W.requestAnimationFrame(loop); };
+    /* kind to laptops: at most ~30 frames a second (cats walk just as well; a 120 Hz screen would otherwise draw 120),
+       and nothing at all while the root is scrolled out of view */
+    this.visible = true;
+    if (W.IntersectionObserver) { this._io = new W.IntersectionObserver(([e]) => { this.visible = e.isIntersecting; }); this._io.observe(root); }
+    const loop = (now) => { if (!this.running) return; W.requestAnimationFrame(loop);
+      if (!this.visible) { last = now; return; }
+      if (now - last < 31) return;
+      const dt = Math.min(0.1, (now - last) / 1000); last = now; this._tick(dt, now); };
     W.requestAnimationFrame(loop);
   }
   _el(tag, css, text) { const e = this.doc.createElement(tag); e.style.cssText = css; if (text) e.textContent = text; this.root.appendChild(e); return e; }
@@ -106,7 +113,7 @@ export class Desk {
   remove(id) { const i = this.cats.findIndex((c) => c.id === id); if (i >= 0) { this.cats[i].f.remove(); this.cats.splice(i, 1); } }
   clear() { for (const c of this.cats) c.f.remove(); this.cats = []; for (const t of this.treats) t.el.remove(); this.treats = []; }
   stop() {
-    this.running = false; this.laser(false); this.clear(); this.tag.remove();
+    this.running = false; if (this._io) this._io.disconnect(); this.laser(false); this.clear(); this.tag.remove();
     const W = this.win; W.removeEventListener("pointermove", this._move); W.removeEventListener("pointerdown", this._down); W.removeEventListener("dblclick", this._dbl);
     W.removeEventListener("scroll", this._scroll); this.doc.documentElement.removeEventListener("pointerleave", this._leave);
     if (this._cur) this.doc.documentElement.style.cursor = "";
