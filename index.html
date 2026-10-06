@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-txS0n76AfnfTBeqL2eOaB7mJpHnFymm2qW25+TTCwuI=' 'sha256-uX5T4PNcwBU2d+jtv/syHlg8DeKMd1v/uc+LmnBRC94='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-khanbB96y4Z0aBDlicMF0jqUMhKN8DpIZ7fqTuqwZOA=' 'sha256-71WR/TnAYRoYG/cqPI9ZXT8aAioaz/PY7WDP9j6tm5g='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -484,6 +484,33 @@ const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzkt.io/v1
 const CIDP = (u) => (typeof u === "string" && /^ipfs:\/\/[A-Za-z0-9]{46,64}(\/[A-Za-z0-9._-]+)*$/.test(u) ? u.slice(7) : "");
 const ipfs = (u) => (CIDP(u) ? "https://ipfs.fileship.xyz/" + CIDP(u) : "");
 const ipfsAlt = (u) => (CIDP(u) ? "https://gateway.pinata.cloud/ipfs/" + CIDP(u) : "");
+/* TzKT reads each token's metadata file from IPFS on its own schedule and can fall hours
+   behind (objkt runs its own indexer, so it doesn't). For a token TzKT hasn't resolved yet, the
+   site follows the contract's own token_metadata link and reads the file itself. If IPFS is slow
+   too, the seed is still on chain: it's the mint's operation hash, so the cat can be drawn anyway. */
+async function freshMeta(ids) {
+  const out = {}; if (!ids.length) return out;
+  const get = (u) => fetch(u, { signal: AbortSignal.timeout(8000) }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/, CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})$/;
+  try {
+    const keys = await get(`${API}contracts/${KT}/bigmaps/token_metadata/keys?${ids.length > 1 ? "key.in=" + ids.join(",") : "key=" + ids[0]}&select=key,value`);
+    await Promise.all(keys.map(async (k) => { try {
+      const hx = String((k.value && k.value.token_info && k.value.token_info[""]) || ""), uri = hx.replace(/[0-9a-f]{2}/g, (h) => String.fromCharCode(parseInt(h, 16)));
+      const cid = CID.exec(uri); if (!cid) return;
+      const m = await get("https://ipfs.fileship.xyz/" + cid[1]);
+      out[k.key] = { name: typeof m.name === "string" ? m.name : "", thumbnailUri: m.thumbnailUri, displayUri: m.displayUri,
+        attributes: Array.isArray(m.attributes) ? m.attributes : [], aleaSeed: SEED.test(m.aleaSeed || "") ? m.aleaSeed : undefined };
+    } catch (e) { /* this one falls back to its mint hash below */ } }));
+  } catch (e) { /* likewise */ }
+  const need = ids.filter((id) => !(out[id] && out[id].aleaSeed));
+  if (need.length) try {
+    const tr = await get(`${API}tokens/transfers?token.contract=${KT}&from.null=true&token.tokenId.in=${need.join(",")}&limit=1000&select=token.tokenId,transactionId`);
+    const ops = tr.length ? await get(`${API}operations/transactions?id.in=${tr.map((t) => t.transactionId).join(",")}&limit=1000&select=id,hash,target`) : [];
+    for (const t of tr) { const op = ops.find((o) => o.id === t.transactionId);
+      if (op && op.target && op.target.address === KT && SEED.test(op.hash)) out[t["token.tokenId"]] = { name: "", attributes: [], ...(out[t["token.tokenId"]] || {}), aleaSeed: op.hash }; }
+  } catch (e) { /* the cat waits for TzKT */ }
+  return out;
+}
 async function liveStatus() {
   try {
     const get = (p) => fetch(API + p).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
@@ -495,10 +522,12 @@ async function liveStatus() {
     $("prog-n").textContent = `${minted} / ${ed} minted`; $("prog-left").textContent = sold ? "Sold out" : `${left} left`;
     $("prog-bar").style.width = (100 * minted / ed).toFixed(1) + "%"; $("prog").hidden = false;
     $("h-live").textContent = sold ? "Sold out" : `● Live · ${minted} / ${ed} minted`;
+    const late = latest.filter((t) => !(t.metadata || {}).name), got = await freshMeta(late.map((t) => t.tokenId));
+    for (const t of late) t.metadata = got[t.tokenId] || t.metadata;
     $("latest").innerHTML = latest.map((t) => { const m = t.metadata || {}, uri = m.thumbnailUri || m.displayUri, img = ipfs(uri);
-      const name = m.name ? m.name.replace(/^Prancers /, "") : `#${num(t.tokenId) + 1} · rendering…`;
+      const name = m.name ? m.name.replace(/^Prancers /, "") : `#${num(t.tokenId) + 1} · just minted`;
       return `<a class="mintcat" href="https://objkt.com/tokens/${KT}/${num(t.tokenId)}" target="_blank" rel="noopener">` +
-        (img ? `<img src="${esc(img)}" data-alt="${esc(ipfsAlt(uri))}" alt="${esc(name)}" loading="lazy">` : `<span class="ph">Rendering…</span>`) + `<span>${esc(name)}</span></a>`; }).join("");
+        (img ? `<img src="${esc(img)}" data-alt="${esc(ipfsAlt(uri))}" alt="${esc(name)}" loading="lazy">` : `<span class="ph">Just minted</span>`) + `<span>${esc(name)}</span></a>`; }).join("");
     $("latest-wrap").hidden = !latest.length;
     $("latest").querySelectorAll("img").forEach((i) => { i.onerror = () => { if (i.dataset.alt && i.src !== i.dataset.alt) i.src = i.dataset.alt; }; });
   } catch (e) { /* offline or API unavailable: the box keeps saying Live */ }
@@ -538,9 +567,12 @@ $("gifform").onsubmit = async (e) => {
     if (!seed) {
       note("Finding your Prancer on chain…");
       const t = await (await fetch(`${API}tokens?contract=${KT}&tokenId=${ref.tokenId}&select=tokenId,metadata`)).json();
-      seed = t[0] && t[0].metadata && t[0].metadata.aleaSeed;
-      if (!seed) throw new Error(t.length ? "That Prancer is still rendering. Try again in a few minutes." : "No Prancer with that number has been minted yet.");
-      name = t[0].metadata.name || name;
+      if (!t.length) throw new Error("No Prancer with that number has been minted yet.");
+      seed = t[0].metadata && t[0].metadata.aleaSeed;
+      const m = seed ? t[0].metadata : (await freshMeta([ref.tokenId]))[ref.tokenId] || {};   // TzKT may not have read it yet
+      seed = m.aleaSeed;
+      if (!seed) throw new Error("Couldn't reach the chain just now. Try again in a moment.");
+      name = m.name || `Prancers #${num(t[0].tokenId) + 1}`;
     }
     note("Drawing your cat…"); await loadGifLib();
     const fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;left:-4000px;top:0;width:600px;height:600px;border:0"; fr.setAttribute("aria-hidden", "true");
@@ -610,6 +642,9 @@ async function loadMine(a) {
   $("d-who").textContent = a.slice(0, 6) + "…" + a.slice(-4); $("d-note").textContent = "Finding your cats…";
   mine = await fetch(`${API}tokens/balances?account=${a}&token.contract=${KT}&balance.gt=0&limit=300&select=token.tokenId,token.metadata`).then((r) => r.json()).catch(() => []);
   mine.sort((x, y) => x["token.tokenId"] - y["token.tokenId"]);
+  const fresh = mine.filter((t) => !(t["token.metadata"] || {}).aleaSeed);   // not yet resolved by TzKT
+  if (fresh.length) { const got = await freshMeta(fresh.map((t) => t["token.tokenId"]));
+    for (const t of fresh) { const m = got[t["token.tokenId"]] || {}; t["token.metadata"] = { ...m, name: m.name || `Prancers #${num(t["token.tokenId"]) + 1}` }; } }
   if (!mine.length) { $("d-note").innerHTML = 'Desk Prancers are for holders, and this address has no Prancers yet. <a href="#mint">Adopt one</a> and come back.'; $("d-ctl").hidden = true; return; }
   chosen = new Set(mine.map((t, i) => i).filter((i) => mine[i]["token.metadata"].aleaSeed).slice(0, 4));
   $("d-note").textContent = mine.length > 1 ? `Pick who comes out (up to ${MAX}).` : "Ready when you are.";

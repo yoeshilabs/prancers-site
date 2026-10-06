@@ -51,12 +51,41 @@ const SECTIONS = [
   ["Shy", "The Shy Ones", "(hi)"], ["Chill", "The Chill Collective", "in no hurry whatsoever"], ["Grumpy", "The Grumpy Section", "attendance mandatory"],
 ];
 let slots = [], planes = [], LOOP = 1, mine = new Set();
+/* TzKT reads each token's metadata file from IPFS on its own schedule and can fall hours
+   behind (objkt runs its own indexer, so it doesn't). For a token TzKT hasn't resolved yet, the
+   site follows the contract's own token_metadata link and reads the file itself. If IPFS is slow
+   too, the seed is still on chain: it's the mint's operation hash, so the cat can be drawn anyway. */
+async function freshMeta(ids) {
+  const out = {}; if (!ids.length) return out;
+  const get = (u) => fetch(u, { signal: AbortSignal.timeout(8000) }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/, CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})$/;
+  try {
+    const keys = await get(`${API}contracts/${KT}/bigmaps/token_metadata/keys?${ids.length > 1 ? "key.in=" + ids.join(",") : "key=" + ids[0]}&select=key,value`);
+    await Promise.all(keys.map(async (k) => { try {
+      const hx = String((k.value && k.value.token_info && k.value.token_info[""]) || ""), uri = hx.replace(/[0-9a-f]{2}/g, (h) => String.fromCharCode(parseInt(h, 16)));
+      const cid = CID.exec(uri); if (!cid) return;
+      const m = await get("https://ipfs.fileship.xyz/" + cid[1]);
+      out[k.key] = { name: typeof m.name === "string" ? m.name : "", thumbnailUri: m.thumbnailUri, displayUri: m.displayUri,
+        attributes: Array.isArray(m.attributes) ? m.attributes : [], aleaSeed: SEED.test(m.aleaSeed || "") ? m.aleaSeed : undefined };
+    } catch (e) { /* this one falls back to its mint hash below */ } }));
+  } catch (e) { /* likewise */ }
+  const need = ids.filter((id) => !(out[id] && out[id].aleaSeed));
+  if (need.length) try {
+    const tr = await get(`${API}tokens/transfers?token.contract=${KT}&from.null=true&token.tokenId.in=${need.join(",")}&limit=1000&select=token.tokenId,transactionId`);
+    const ops = tr.length ? await get(`${API}operations/transactions?id.in=${tr.map((t) => t.transactionId).join(",")}&limit=1000&select=id,hash,target`) : [];
+    for (const t of tr) { const op = ops.find((o) => o.id === t.transactionId);
+      if (op && op.target && op.target.address === KT && SEED.test(op.hash)) out[t["token.tokenId"]] = { name: "", attributes: [], ...(out[t["token.tokenId"]] || {}), aleaSeed: op.hash }; }
+  } catch (e) { /* the cat waits for TzKT */ }
+  return out;
+}
 async function lineUp() {
   const [tokens, rarity] = await Promise.all([
-    fetch(`${API}tokens?contract=${KT}&metadata.aleaSeed.null=false&limit=1000&select=tokenId,metadata`).then((r) => r.json()),
+    fetch(`${API}tokens?contract=${KT}&limit=1000&select=tokenId,metadata`).then((r) => r.json()),
     fetch("rarity.json").then((r) => r.json()).catch(() => null)]);
+  const fresh = tokens.filter((t) => !(t.metadata || {}).aleaSeed), got = await freshMeta(fresh.map((t) => t.tokenId));
+  for (const t of fresh) t.metadata = got[t.tokenId] || {};   // without traits yet, a cat marches with the New Recruits
   const cats = tokens.map((t) => { const m = t.metadata || {}, f = Object.fromEntries((m.attributes || []).map((a) => [a.name, a.value]));
-    const n = Number(t.tokenId) + 1, name = String(m.name || "").replace(/^Prancers #\d+ · /, "");
+    const n = Number(t.tokenId) + 1, name = m.name ? String(m.name).replace(/^Prancers #\d+ · /, "") : "New Recruit";
     let score = 0; if (rarity) for (const [k, v] of Object.entries(f)) { const c = rarity.traits[k] && rarity.traits[k][v]; if (c) score += -Math.log(c / rarity.sample); }
     return { id: Number(t.tokenId), n, name, seed: m.aleaSeed, temp: f.Temperament, plain: f.Color === "White" || /solid white/i.test(f["White Spots"] || ""), score }; })
     .filter((c) => /^o[1-9A-HJ-NP-Za-km-z]{50}$/.test(c.seed || ""));
@@ -70,6 +99,8 @@ async function lineUp() {
     if (!group.length) continue;
     sign(title, sub); for (const c of group) out.push({ kind: "cat", cat: c, w: GAP });
   }
+  const recruits = cats.filter((c) => !c.temp).sort((a, b) => a.n - b.n);
+  if (recruits.length) { sign("The New Recruits", "fresh from the mint"); for (const c of recruits) out.push({ kind: "cat", cat: c, w: GAP }); }
   let at = 0; for (const s of out) { s.at = at + s.w / 2; at += s.w; }
   slots = out; LOOP = at + street.clientWidth * 0.6;          // a short empty stretch, then the head comes round again
   planes = heads.map((hd, k) => ({ ...hd, at: out[hd.first].at, alt: k % 2 }));
@@ -212,6 +243,10 @@ addEventListener("address:change", (e) => loadMine(e.detail));
 $("p-watch").onsubmit = async (e) => { e.preventDefault(); try { $("p-note").textContent = "Looking up…"; await lookup($("p-addr").value); } catch (err) { $("p-note").textContent = err.message || "Couldn't find that address."; } };
 $("p-connect").onclick = async () => { $("p-note").textContent = "Opening your wallet… it will only be asked for your address.";
   try { await lookup(await connectReadOnly()); } catch (e) { $("p-note").textContent = "Not connected. You can paste your address instead."; } };
+
+/* a hook for the reel-capture tools, on localhost only: where everything is, from the same clock */
+if (location.hostname === "localhost") window.__parade = { get slots() { return slots; }, get planes() { return planes; }, get LOOP() { return LOOP; },
+  get SPEED() { return SPEED; }, head, screenX, epoch: PARADE_EPOCH, street };
 
 lineUp().then(() => { lists(); setInterval(lists, 1000); }).catch(() => { $("p-count").textContent = "Couldn't reach the chain just now. Refresh to try again."; });
 requestAnimationFrame(tick);
