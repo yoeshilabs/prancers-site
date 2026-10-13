@@ -307,8 +307,15 @@
   .labtabs button small { margin-left: 8px; font: 700 11px var(--mono); opacity: .8; }
   /* the story */
   .tabs, .projbar .wrap, nav .links { scrollbar-width: none; } .tabs::-webkit-scrollbar, nav .links::-webkit-scrollbar { display: none; }
-  .introgrid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
-  @media (max-width: 900px) { .introgrid { grid-template-columns: 1fr; } }
+  .banner { position: relative; border-radius: 26px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 1; background: #000;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .18); }
+  .banner video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .banner { margin-top: 18px; }
+  .bannertext { position: absolute; left: 32px; bottom: 22px; z-index: 1; } .bannertext h1 { font-size: clamp(56px, 9vw, 128px); }
+
+  .intro .lede { margin: 22px 0 0; }
+  .sheetrow { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 28px; align-items: center; padding-bottom: 56px; }
+  @media (max-width: 860px) { .sheetrow { grid-template-columns: 1fr; } }
   .introvid { border-radius: 26px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .18); aspect-ratio: 1; background: #000; }
   .introvid video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .chapter { position: relative; overflow: hidden; }
@@ -358,12 +365,10 @@
   <div id="me"></div>
 </div></nav>
 
-<header id="top" class="intro"><div class="wrap"><div class="introgrid"><div>
-  <div class="kicker">Welcome</div>
-  <h1 class="neon">PRANCERS</h1>
+<header id="top" class="intro"><div class="wrap">
+  <div class="kicker">Welcome to the Prancer Purranchise</div><h1 class="neon">PRANCERS</h1>
+  <div class="banner"><video src="media/banner.mp4" poster="media/banner.jpg" autoplay muted loop playsinline aria-label="The four collections, alive: a Prancer walking, a Pad, a portrait and a Wild Ride"></video></div>
   <p class="lede">A family of living, generative cats on Tezos. Every one is born from its mint hash, lives fully on-chain, and is alive: they walk, purr, react to you and sing. Here's their story so far.</p>
-  </div>
-  <div class="introvid"><video src="media/live-sheet.mp4" autoplay muted loop playsinline aria-label="Nine live Prancers, each being played with"></video></div></div>
   <div class="chapters">
     <a class="card chap" href="#prancers"><span class="num">01</span><b>They walk on the beat</b><small>Prancers · live</small></a>
     <a class="card chap" href="#pads"><span class="num">02</span><b>They got their own pads</b><small>Prancer Pads · live</small></a>
@@ -414,7 +419,9 @@
     <div class="progress" id="pfp-prog" hidden><div class="row"><b id="pfp-n"></b><span id="pfp-left"></span></div><div class="track"><i id="pfp-bar"></i></div></div>
     <div class="cta"><a class="btn" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener">Mint on Aleatory</a><button class="btn ghost" type="button" data-roll="pfp">🎲 Meet another cat</button><button class="btn ghost" type="button" data-gif="pfp">Make a GIF</button></div>
   </div>
-</div></section>
+</div>
+<div class="wrap sheetrow"><div class="introvid"><video src="media/live-sheet.mp4" autoplay muted loop playsinline aria-label="Nine Prancer Portraits, each being played with"></video></div>
+  <p class="small">Nine portraits, nine people playing with them: eyes follow the cursor, a stroke gets a purr, a tap gets a reaction, laser eyes track you, and the mythics fight back.</p></div></section>
 
 <section id="ride" class="chapter"><div class="wrap phero">
   <div class="stage"><iframe id="ride-stage" title="A live Wild Ride — tap for the band" allow="autoplay"></iframe><span class="tag">live · tap for sound</span></div>
