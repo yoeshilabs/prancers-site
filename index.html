@@ -438,18 +438,19 @@
 
 <section id="lab" class="chapter"><div class="wrap">
   <div class="head"><div><div class="kicker">The Lab · for every cat</div><h2>Make a GIF of any Prancer.</h2></div>
-    <p>Pick a collection, paste a mint hash or roll the dice, and watch your cat come to life as a GIF. It's drawn right here in your browser, frame for frame. Nothing gets uploaded.</p></div>
+    <p>Pick a collection, choose one of your cats or roll the dice, and watch it come to life as a GIF. It's drawn right here in your browser, frame for frame. Nothing gets uploaded.</p></div>
   <div class="labtabs" role="tablist" aria-label="Collection"><button type="button" role="tab" data-lp="prancers" aria-selected="true">Prancers</button><button type="button" role="tab" data-lp="pads" aria-selected="false">Prancer Pads</button><button type="button" role="tab" data-lp="pfp" aria-selected="false">Prancer PFP</button><button type="button" role="tab" data-lp="ride" aria-selected="false">Wild Ride</button></div>
   <div class="card labbar">
     <label hidden>Collection <select id="lab-proj"><option value="prancers">Prancers</option><option value="pads">Prancer Pads</option><option value="pfp">Prancer PFP</option><option value="ride">Wild Ride</option></select></label>
-    <label class="grow">Mint hash (empty for a random cat) <input type="text" id="lab-seed" placeholder="oo… or paste an Aleatory / objkt link" autocomplete="off" spellcheck="false"></label>
+    <label class="grow">Your cats <select id="lab-pick"><option value="">🎲 A random cat</option></select><input type="hidden" id="lab-seed"></label>
     <label>Size <select id="lab-size"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label>
-    <div class="labbtns"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show">Show this cat</button></div>
+    <div class="labbtns"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show" hidden>Show</button></div>
     <label class="check"><input type="checkbox" id="lab-play" checked> show someone playing with it</label>
     <div class="labbtns"><button class="btn" type="button" id="lab-go">Make GIF</button><a class="btn ghost" id="lab-a" download hidden>Download GIF</a></div>
   </div>
   <div class="gifbar" id="lab-barw" hidden><i id="lab-bar"></i></div>
   <p class="lookup-note" id="lab-note" aria-live="polite" style="margin:12px 0 0"></p>
+  <p class="small" id="lab-hint" hidden><a href="#yours">Connect your wallet</a> to pick from your own cats.</p>
   <div class="labgrid">
     <div><div class="paneltitle">Live preview</div><div class="stage"><iframe id="lab-stage" title="The cat you picked" allow="autoplay"></iframe><span class="tag" id="lab-tag">preview</span></div></div>
     <div><div class="paneltitle">Your GIF</div><div class="gifout" id="lab-out"><p>Your GIF appears here.</p></div></div>

@@ -35,3 +35,20 @@ function view() {
 }
 $("coll-who").textContent = "";
 addEventListener("me:change", () => { $("coll-who").textContent = who(); render(); }); render();
+
+/* the Lab picks from your cats: one dropdown per collection tab, plus a random cat for anyone */
+const pickSel = $("lab-pick"), seedIn = $("lab-seed");
+function fillLab() {
+  const S = me(), proj = $("lab-proj").value, mine = (S.all && S.all[proj]) || [], cur = seedIn.value;
+  const opts = [`<option value="">🎲 A random cat</option>`, ...mine.map((c) => `<option value="${esc(c.seed)}">${esc(c.name)}</option>`)];
+  if (cur && !mine.some((c) => c.seed === cur)) opts.push(`<option value="${esc(cur)}">🎲 The cat you rolled</option>`);
+  pickSel.innerHTML = opts.join(""); pickSel.value = cur && pickSel.querySelector(`option[value="${CSS.escape(cur)}"]`) ? cur : "";
+  $("lab-hint").hidden = S.status === "ready";
+}
+pickSel.onchange = () => { seedIn.value = pickSel.value; $("lab-show").click(); };
+/* refill when the tab changes, when a cat arrives from elsewhere on the page, and when your wallet loads */
+document.addEventListener("click", (e) => { const t = e.target.closest("[data-lp], [data-gif], #gifgo, #coll-gif, #hero-gif, #lab-roll"); if (!t) return;
+  setTimeout(() => { const mine = (me().all || {})[$("lab-proj").value] || [];
+    if (t.matches("[data-lp]") && mine.length) { seedIn.value = mine[0].seed; $("lab-show").click(); }   /* a new tab opens on your first cat there */
+    fillLab(); }, 0); });
+addEventListener("me:change", fillLab); fillLab();

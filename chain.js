@@ -75,6 +75,6 @@ export async function allHoldings(address) {
   await Promise.all(LINEUP.map(async ([k, kt, label]) => {
     const rows = bal.filter((b) => b["token.contract.address"] === kt).map((b) => ({ id: b["token.tokenId"], m: b["token.metadata"] }));
     const cats = rows.length ? await fill(rows, kt) : [];
-    out[k] = cats.map((c) => ({ ...c, coll: k, kt, name: c.name.replace(new RegExp("^" + label + " #\\d+ · "), "").replace(/^Prancer #/, label + " #") })).sort((a, b) => a.id - b.id); }));
+    out[k] = cats.map((c) => ({ ...c, coll: k, kt, name: c.name.replace(/^[^#·]+ #\d+ · /, "").replace(/^Prancer #/, label + " #") })).sort((a, b) => a.id - b.id); }));
   return out;
 }
