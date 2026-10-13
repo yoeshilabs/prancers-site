@@ -1,4 +1,4 @@
-/* Connect a wallet to read its address — and nothing else.
+/* Connect a wallet to read its address, and nothing else.
 
    - The permission request asks for no scopes at all: no operation requests,
      no message signing, no encryption, no notifications. The wallet is only
