@@ -9,6 +9,7 @@ const LAB = { prancers: "Prancers", pads: "Prancer Pads", pfp: "Prancer PFP", ri
 let tab = "all", pick = null;
 const list = () => { const S = me(); return tab === "all" ? LINEUP.flatMap(([k]) => S.all[k] || []) : S.all[tab] || []; };
 function render() {
+  if (!host) return;                                                                  /* the collection view is optional on a page */
   const S = me();
   if (S.status !== "ready" || !S.total) { host.hidden = true; return; }
   host.hidden = false;
@@ -33,8 +34,7 @@ function view() {
   $("coll-gif").onclick = () => window.toLab && window.toLab(pick.coll, pick.seed);
   $("coll-gif").disabled = !pick.seed;
 }
-$("coll-who").textContent = "";
-addEventListener("me:change", () => { $("coll-who").textContent = who(); render(); }); render();
+if ($("coll-who")) { $("coll-who").textContent = ""; addEventListener("me:change", () => { $("coll-who").textContent = who(); render(); }); render(); }
 
 /* the Lab picks from your cats: one dropdown per collection tab, plus a random cat for anyone */
 const pickSel = $("lab-pick"), seedIn = $("lab-seed");
@@ -56,7 +56,7 @@ addEventListener("me:change", fillLab); fillLab();
 /* not connected yet: one clean card to connect (or paste an address) */
 import("./me.js").then(({ connectForm }) => {
   const box = $("coll-connect");
-  const show = () => { const S = me(); box.hidden = S.status === "ready" && S.total > 0 ? true : S.status === "loading" ? true : false;
-    if (!box.hidden && !box.dataset.on) { box.dataset.on = 1; box.innerHTML = `<h3>Connect once</h3><p class="small">Your cats from every project show up right here.</p><div data-f></div>`; connectForm(box.querySelector("[data-f]")); }
-    if (S.status === "ready" && !S.total) box.querySelector("h3").textContent = "No Prancers here yet"; };
+  const show = () => { const S = me(); box.hidden = S.status === "ready" || S.status === "loading";
+    if (!box.hidden && !box.dataset.on) { box.dataset.on = 1; box.innerHTML = `<h3>Connect once</h3><p class="small">Your Prancers come out to play right here.</p><div data-f></div>`; connectForm(box.querySelector("[data-f]")); }
+  };
   addEventListener("me:change", show); show(); });

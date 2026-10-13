@@ -76,7 +76,7 @@ export function mountChip(host, { home = "" } = {}) {
     pop.innerHTML = `<h4>${esc(who())}</h4><p class="me-addr">${esc(S.address)}</p>` +
       (S.status === "loading" ? "<p>Finding your cats…</p>" : S.status === "error" ? `<p>${esc(S.note)}</p>`
         : S.total ? `<div class="me-cats">${every().slice(0, 24).map((c) => `<span title="${esc(c.name)}">${c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "<i></i>"}</span>`).join("")}</div><p>${
-          [["prancers", "Prancers"], ["pads", "Pads"], ["pfp", "PFP"], ["ride", "Wild Ride"]].filter(([k]) => (S.all[k] || []).length).map(([k, l]) => `${l} ${S.all[k].length}`).join(" · ")} · <a href="${home || "index.html"}#yours">open your collection</a></p>`
+          [["prancers", "Prancers"], ["pads", "Pads"], ["pfp", "PFP"], ["ride", "Wild Ride"]].filter(([k]) => (S.all[k] || []).length).map(([k, l]) => `${l} ${S.all[k].length}`).join(" · ")} · <a href="${home || "index.html"}#yours">Desk Prancers</a></p>`
         : `<p>No Prancers at this address yet. <a href="index.html#prancers">Adopt one</a>.</p>`) +
       `<div class="me-row"><button class="btn ghost" type="button" data-o>Use another address</button><button class="btn ghost" type="button" data-x>Forget</button></div>`;
     pop.querySelector("[data-x]").onclick = () => { forget(); };

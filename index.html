@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-Ve2PHmNAorpcYaeH86KImhwRXspPq70LE/T8Mc4GlNc=' 'sha256-Sb0o6WseORYf4AQU5sROtpJNeXdt3W28IBgySQtwZCc='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-Ve2PHmNAorpcYaeH86KImhwRXspPq70LE/T8Mc4GlNc=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -326,6 +326,7 @@
   .subhead { font: 700 18px var(--mono); margin: 48px 0 14px; }
   .collconnect { max-width: 640px; } .collconnect h3 { font: 700 18px var(--mono); margin: 0 0 6px; }
   @media (prefers-reduced-motion: reduce) { .banner video, .introvid video { display: none; } .banner { background: #000 url(media/banner.jpg) center / cover; } }
+  #yours .studio .tabs { display: none; }                                              /* one room, no tabs */
   /* your collection */
   .coll { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: start; margin-bottom: 8px; }
   @media (max-width: 900px) { .coll { grid-template-columns: 1fr; } }
@@ -393,7 +394,7 @@
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
   <button class="menubtn" type="button" aria-expanded="false" aria-controls="navlinks" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="links" id="navlinks"><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">PFP</a><a href="#ride">Wild Ride</a><a href="#lab">Lab</a><a href="#yours" class="mob">Your collection</a></div>
+  <div class="links" id="navlinks"><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">PFP</a><a href="#ride">Wild Ride</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
   <div id="me"></div>
 </div></nav>
 
@@ -401,7 +402,7 @@
   <div class="kicker">Welcome to the Prancer Purranchise</div><h1 class="neon">PRANCERS</h1>
   <div class="banner"><video src="media/banner.mp4" poster="media/banner.jpg" autoplay muted loop playsinline aria-label="The four collections, alive: a Prancer walking, a Pad, a portrait and a Wild Ride"></video></div>
   <div class="introrow"><p class="lede">Living, breathing cats, born on Tezos. They strut to the beat, purr when you pet them and sing when you tap. Every one is one-of-a-kind, drawn live from its mint and kept fully on-chain. Pull up a chair, here's the story so far.</p>
-    <div class="cta"><a class="btn" href="#prancers">Start the story</a><a class="btn ghost" href="#yours">Your collection</a></div></div>
+    <div class="cta"><a class="btn" href="#prancers">Start the story</a><a class="btn ghost" href="#yours">Desk Prancers</a></div></div>
 </div></header>
 
 <section id="prancers" class="chapter"><div class="wrap chap-grid">
@@ -480,24 +481,13 @@
   <div class="head"><div><div class="kicker" id="y-kick">Your Prancers</div><h2 id="y-title">Un-chain your cats.</h2></div>
     <p id="y-lede"></p></div>
   <div class="card collconnect" id="coll-connect" hidden></div>
-  <div class="coll" id="coll" hidden>
-    <div class="collview">
-      <div class="stage"><iframe id="coll-stage" title="The token you picked, live" allow="autoplay"></iframe><span class="tag">live · tap for sound</span></div>
-      <div class="collmeta"><div class="kicker" id="coll-kind"></div><h3 id="coll-name"></h3>
-        <div class="cta"><button class="btn" type="button" id="coll-gif">Make a GIF</button><a class="btn ghost" id="coll-objkt" target="_blank" rel="noopener">View on objkt</a></div></div>
-    </div>
-    <div class="collside"><div class="collhead"><span class="paneltitle">Your collection · <span id="coll-who"></span></span></div>
-      <div class="labtabs" id="coll-tabs" role="tablist" aria-label="Your collection"></div>
-      <div class="collgrid" id="coll-grid"></div></div>
-  </div>
-  <h3 class="subhead">Play with your Prancers</h3>
   <div class="yourtop" hidden>
     <div class="shelf" id="shelf" aria-label="Your Prancers"></div>
     <div class="card traits" id="card" aria-live="polite"></div>
   </div>
   <div class="studio">
     <div class="tabs" role="tablist" aria-label="The studio">
-      <button type="button" role="tab" data-tab="gif" aria-selected="false" hidden>Your cat</button><button type="button" role="tab" data-tab="desk" aria-selected="true">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
+      <button type="button" role="tab" data-tab="gif" aria-selected="false" hidden>Your cat</button><button type="button" role="tab" data-tab="desk" aria-selected="true" hidden>Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false" hidden>Parade</button>
     </div>
     <div class="panel" data-panel="gif" role="tabpanel" hidden>
       <div class="gifroom">
@@ -875,10 +865,10 @@ const portrait = (c) => (paintQ = paintQ.then(() => new Promise((res) => { paint
 function shelf() {
   const S = me(), cats = all(), el = $("shelf"), n = own().length;
   const tot = S.total || 0;
-  $("y-kick").textContent = S.address ? `Your collection · ${who()}` : "Your collection";
-  $("y-title").textContent = tot ? (tot > 1 ? "Your cats, un-chained." : "Your cat, un-chained.") : "Un-chain your cats.";
-  $("y-lede").textContent = tot ? "Pick any of your cats to play with it live, turn it into a GIF, or let your Prancers roam the page."
-    : "Connect once and your whole collection shows up here, across every project.";
+  $("y-kick").textContent = S.address ? `Desk Prancers · ${who()}` : "Desk Prancers";
+  $("y-title").textContent = n ? (n > 1 ? "Your cats, un-chained." : "Your cat, un-chained.") : "Un-chain your cats.";
+  $("y-lede").textContent = n ? `Let your Prancer${n > 1 ? "s" : ""} loose on this page. They climb on buttons, nap on cards and come running when you call.`
+    : "Connect once and your Prancers come out to play: they roam this page, climb on buttons, nap on cards and come running when you call.";
   let h = "";
   if (S.status === "none" || S.status === "error") h += `<div class="pc hello"><h3>Connect once</h3><p>${S.status === "error" ? esc(S.note) : "Your Prancers show up here and in every part of the studio, the Parade too."}</p><div data-cf></div></div>`;
   else if (S.status === "loading") h += `<div class="pc hello"><h3>Finding your cats…</h3><p>${esc(who())}</p></div>`;
