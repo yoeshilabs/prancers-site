@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-LQdFXJ1raBKTmELX2y19sFY4ON69dCh9SIbyqSWCQAk=' 'sha256-/KuKhCTtVpRaTs94g7poVsaG5zZmxvH83JFHepvQ6MQ='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-JdlBxikk7C/saZXaAgV0bKvsxAO3kw0BnzAA7FZzjSQ=' 'sha256-f197JisTSEmGN4ZukAAORNDLhwrsXo50S3cc5q06mYc='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,6 +296,19 @@
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 
   /* the story */
+  .tabs, .projbar .wrap, nav .links { scrollbar-width: none; } .tabs::-webkit-scrollbar, nav .links::-webkit-scrollbar { display: none; }
+  .introgrid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+  @media (max-width: 900px) { .introgrid { grid-template-columns: 1fr; } }
+  .introvid { border-radius: 26px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .18); aspect-ratio: 1; background: #000; }
+  .introvid video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .chapter { position: relative; overflow: hidden; }
+  .chapter:nth-of-type(even) { background: linear-gradient(180deg, rgba(255, 95, 162, .05), rgba(255, 95, 162, 0) 60%); }
+  .chapter .stage { box-shadow: 0 30px 70px rgba(0, 0, 0, .5), 0 0 50px rgba(255, 95, 162, .14); }
+  .chapter .kicker { display: inline-block; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255, 95, 162, .4); background: rgba(255, 95, 162, .08); }
+  .stats .stat { background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .01)); }
+  .labtabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .labtabs button { border: 1px solid var(--line); background: transparent; color: var(--mute); border-radius: 999px; padding: 10px 18px; font: 700 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+  .labtabs button[aria-selected="true"] { color: #1a0610; background: var(--neon); border-color: var(--neon); box-shadow: 0 0 18px var(--neon-soft); }
   .intro { padding: 72px 0 24px; } .intro h1 { font-size: clamp(72px, 12vw, 160px); } .intro .lede { max-width: 720px; }
   .chapters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
   @media (max-width: 860px) { .chapters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -335,10 +348,12 @@
   <div id="me"></div>
 </div></nav>
 
-<header id="top" class="intro"><div class="wrap">
+<header id="top" class="intro"><div class="wrap"><div class="introgrid"><div>
   <div class="kicker">Welcome</div>
   <h1 class="neon">PRANCERS</h1>
   <p class="lede">A family of living, generative cats on Tezos. Every one is born from its mint hash, lives fully on-chain, and is alive: they walk, purr, react to you and sing. Here's their story so far.</p>
+  </div>
+  <div class="introvid"><video src="media/live-sheet.mp4" autoplay muted loop playsinline aria-label="Nine live Prancers, each being played with"></video></div></div>
   <div class="chapters">
     <a class="card chap" href="#prancers"><span class="num">01</span><b>They walk on the beat</b><small>Prancers · live</small></a>
     <a class="card chap" href="#pads"><span class="num">02</span><b>They got their own pads</b><small>Prancer Pads · live</small></a>
@@ -360,7 +375,7 @@
     <div class="readout" aria-live="polite"><div class="title" id="h-title">Waking a cat…</div><div class="genes" id="h-genes"></div></div>
     <div class="stats"><div class="stat"><small>Edition</small><b id="m-edition">TBA</b></div><div class="stat"><small>Price</small><b id="m-price">TBA</b></div><div class="stat"><small>Status</small><b id="m-date">Live</b></div></div>
     <div class="progress" id="prog" hidden><div class="row"><b id="prog-n"></b><span id="prog-left"></span></div><div class="track"><i id="prog-bar"></i></div></div>
-    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><button class="btn ghost" id="roll" type="button">🎲 Meet another cat</button><span class="note" id="h-live"></span></div>
+    <div class="cta"><a class="btn" data-mint href="#">Mint on Aleatory</a><button class="btn ghost" id="roll" type="button">🎲 Meet another cat</button><button class="btn ghost" type="button" id="hero-gif">Make a GIF</button><span class="note" id="h-live"></span></div>
   </div>
 </div></section>
 
@@ -407,8 +422,9 @@
 <section id="lab" class="chapter"><div class="wrap">
   <div class="head"><div><div class="kicker">The Lab · for every cat</div><h2>Make a GIF of any Prancer.</h2></div>
     <p>Pick a collection, paste a mint hash (or roll a random one) and your cat is redrawn exactly, frame by frame, right here in your browser. Nothing is uploaded.</p></div>
+  <div class="labtabs" role="tablist" aria-label="Collection"><button type="button" role="tab" data-lp="prancers" aria-selected="true">Prancers</button><button type="button" role="tab" data-lp="pads" aria-selected="false">Prancer Pads</button><button type="button" role="tab" data-lp="pfp" aria-selected="false">Prancer PFP</button><button type="button" role="tab" data-lp="ride" aria-selected="false">Wild Ride</button></div>
   <div class="card labbar">
-    <label>Collection <select id="lab-proj"><option value="prancers">Prancers</option><option value="pads">Prancer Pads</option><option value="pfp">Prancer PFP</option><option value="ride">Wild Ride</option></select></label>
+    <label hidden>Collection <select id="lab-proj"><option value="prancers">Prancers</option><option value="pads">Prancer Pads</option><option value="pfp">Prancer PFP</option><option value="ride">Wild Ride</option></select></label>
     <label class="grow">Mint hash (empty for a random cat) <input type="text" id="lab-seed" placeholder="oo… or paste an Aleatory / objkt link" autocomplete="off" spellcheck="false"></label>
     <label>Size <select id="lab-size"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label>
     <div class="labbtns"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show">Show this cat</button></div>
@@ -436,21 +452,16 @@
   </div>
   <div class="studio">
     <div class="tabs" role="tablist" aria-label="The studio">
-      <button type="button" role="tab" data-tab="gif" aria-selected="true">GIF</button><button type="button" role="tab" data-tab="desk" aria-selected="false">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
+      <button type="button" role="tab" data-tab="gif" aria-selected="true">Your cat</button><button type="button" role="tab" data-tab="desk" aria-selected="false">Desk Prancers</button><button type="button" role="tab" data-tab="parade" aria-selected="false">Parade</button>
     </div>
     <div class="panel" data-panel="gif" role="tabpanel">
       <div class="gifroom">
         <div class="stage"><iframe id="y-stage" title="The Prancer you picked — tap it to hear its theme song" allow="autoplay"></iframe><span class="tag" id="y-tag">tap the cat for sound</span></div>
         <div>
-          <p class="lead">Your cat walking one full loop of its song, redrawn here exactly, as a GIF you can post anywhere. Nothing is uploaded.</p>
-          <div class="gifmaker" style="display:block">
-            <div class="opts"><label><input type="checkbox" id="giftap"> include a tap reaction</label>
-              <label>size <select id="gifsize"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
-            <div class="cta"><button class="btn" type="button" id="gifgo">Make GIF</button><a class="btn ghost" id="gifa" download hidden>Download GIF</a></div>
-            <div class="gifbar" id="gifbarw" hidden><i id="gifbar"></i></div>
-            <p class="lookup-note" id="gifnote" aria-live="polite" style="margin-top:10px"></p>
-            <div class="gifout" id="gifout"><p>Your GIF appears here.</p></div>
-          </div>
+          <div class="kicker">Your cat</div>
+          <p class="lead" style="margin-top:10px">Tap it to hear its song. Want it as a GIF? The Lab redraws it exactly, walking one full loop of its song, with someone playing with it if you like.</p>
+          <div class="cta"><button class="btn" type="button" id="gifgo">Make a GIF in the Lab</button></div>
+          <div hidden><input type="checkbox" id="giftap"><select id="gifsize"><option value="400" selected>400</option></select><a id="gifa" hidden></a><div id="gifbarw"><i id="gifbar"></i></div><p id="gifnote"></p><div id="gifout"></div></div>
         </div>
       </div>
     </div>
@@ -694,8 +705,7 @@ const lazy = new IntersectionObserver((es) => es.forEach((e) => { if (!e.isInter
   if (p === "pads" || p === "pfp" || p === "ride") showStage(p); if (p === "lab" && !labShown) labShow(); }), { rootMargin: "300px" });
 ["pads", "ride", "pfp", "lab"].forEach((id) => { const el = document.getElementById(id); if (el) lazy.observe(el); });
 document.querySelectorAll("[data-roll]").forEach((b) => b.onclick = () => showStage(b.dataset.roll));
-document.querySelectorAll("[data-gif]").forEach((b) => b.onclick = () => { const p = b.dataset.gif; document.getElementById("lab-proj").value = p; document.getElementById("lab-seed").value = stageSeed[p] || ""; labShow();
-  document.getElementById("lab").scrollIntoView({ behavior: "smooth" }); });
+document.querySelectorAll("[data-gif]").forEach((b) => b.onclick = () => window.toLab(b.dataset.gif, stageSeed[b.dataset.gif]));
 
 /* ---------------------------------------------------------- the lab: a GIF of any Prancer
    Prancers is redrawn through its own hook (one seamless loop). Pads and PFP run in a hidden frame on a
@@ -708,6 +718,11 @@ function labShow() { labShown = true; const p = L$("lab-proj").value; let s = la
   L$("lab-stage").src = `${GEN[p]}?seed=${encodeURIComponent(s)}`; L$("lab-tag").textContent = { prancers: "Prancers", pads: "Prancer Pads", ride: "Wild Ride", pfp: "Prancer PFP" }[p]; }
 L$("lab-roll").onclick = () => { L$("lab-seed").value = rndSeed(); labShow(); };
 L$("lab-show").onclick = labShow; L$("lab-proj").onchange = () => { L$("lab-seed").value = ""; labShow(); };
+const labTab = (p) => { L$("lab-proj").value = p; document.querySelectorAll("[data-lp]").forEach((b) => b.setAttribute("aria-selected", b.dataset.lp === p)); };
+document.querySelectorAll("[data-lp]").forEach((b) => b.onclick = () => { labTab(b.dataset.lp); L$("lab-seed").value = ""; labShow(); });
+/* anywhere on the page: send a cat to the Lab */
+L$("hero-gif").onclick = () => window.toLab("prancers", typeof heroSeed !== "undefined" ? heroSeed : "");
+window.toLab = (p, seed) => { labTab(p); L$("lab-seed").value = seed || ""; labShow(); L$("lab").scrollIntoView({ behavior: "smooth" }); };
 
 let labBusy = false;
 async function labGif() {
@@ -829,14 +844,14 @@ function pick(c) {
   if (!c) return;
   const k = key(c), same = k === focus; focus = k; shelf();
   $("y-tag").innerHTML = `<b>${esc(label(c))}</b> · tap for sound`;
-  $("gifgo").textContent = `Make a GIF of ${c.name || "this cat"}`;
+  $("gifgo").textContent = `Make a GIF of ${c.name || "this cat"} in the Lab`;
   if (same) return;
   $("card").innerHTML = '<p class="small">Waking the cat…</p>'; $("gifnote").textContent = ""; $("gifa").hidden = true; $("gifout").innerHTML = "<p>Your GIF appears here.</p>";
   stage.src = `${CONFIG.generator}?seed=${encodeURIComponent(c.seed)}`;
 }
 stage.addEventListener("load", () => { stagePause(); const x = stage.contentWindow.$alea && stage.contentWindow.$alea._features; if (!x) return;
   showTraits(x); const c = focused(); if (c && !c.name) { c.name = x.Name; c.temp = x.Temperament; shelf(); } });
-$("gifgo").onclick = () => { const c = focused(); if (c) makeGif(c.seed, c.n ? `Prancers #${c.n} · ${c.name}` : c.name); };
+$("gifgo").onclick = () => { const c = focused(); if (c) window.toLab("prancers", c.seed); };
 
 /* ---- the studio's tabs ---- */
 const tabs = [...document.querySelectorAll("#yours [data-tab]")];
