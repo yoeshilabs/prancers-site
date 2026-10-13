@@ -5,10 +5,10 @@
    "Forget" clears it. Pages listen for "me:change" on window; detail is the state below. */
 import { connectReadOnly, disconnectWallet } from "./connect.js";
 import { lookup } from "./address.js";
-import { holdings } from "./chain.js";
+import { allHoldings } from "./chain.js";
 
 const KEY = "prancers.me", TZ = /^tz[1-4][1-9A-HJ-NP-Za-km-z]{33}$/;
-const S = { address: null, name: "", cats: [], status: "none", note: "" };   // status: none · loading · ready · error
+const S = { address: null, name: "", cats: [], all: {}, total: 0, status: "none", note: "" };   // cats: Prancers (the studio); all: every collection   // status: none · loading · ready · error
 const emit = () => dispatchEvent(new CustomEvent("me:change", { detail: S }));
 const store = (a) => { try { if (a) localStorage.setItem(KEY, a); else localStorage.removeItem(KEY); } catch (e) { /* private mode: just this visit */ } };
 export const me = () => S;
@@ -25,18 +25,18 @@ async function tezName(a) {
   } catch (e) { return ""; }
 }
 async function load(a) {
-  Object.assign(S, { address: a, name: "", cats: [], status: "loading", note: "Finding your cats…" }); emit();
+  Object.assign(S, { address: a, name: "", cats: [], all: {}, total: 0, status: "loading", note: "Finding your cats…" }); emit();
   try {
     const retry = async (f, n = 3) => { for (let i = 0; ; i++) { try { return await f(); } catch (e) { if (i >= n - 1) throw e; await new Promise((r) => setTimeout(r, 1500 * (i + 1))); } } };   // TzKT rate-limits bursts
-    const [cats, name] = await Promise.all([retry(() => holdings(a)), tezName(a)]);
+    const [all, name] = await Promise.all([retry(() => allHoldings(a)), tezName(a)]);
     if (S.address !== a) return;
-    Object.assign(S, { cats, name, status: "ready", note: "" });
+    Object.assign(S, { cats: all.prancers || [], all, total: Object.values(all).reduce((n, l) => n + l.length, 0), name, status: "ready", note: "" });
   } catch (e) { if (S.address !== a) return; Object.assign(S, { status: "error", note: "Couldn't read your Prancers just now. Try again in a moment." }); }
   emit();
 }
 export async function useAddress(input) { const a = await lookup(input); store(a); await load(a); return a; }
 export async function connect() { return useAddress(await connectReadOnly()); }
-export function forget() { store(null); disconnectWallet(); Object.assign(S, { address: null, name: "", cats: [], status: "none", note: "" }); emit(); }
+export function forget() { store(null); disconnectWallet(); Object.assign(S, { address: null, name: "", cats: [], all: {}, total: 0, status: "none", note: "" }); emit(); }
 export const reload = () => S.address && load(S.address);
 { let a = null; try { a = localStorage.getItem(KEY); } catch (e) {} if (a && TZ.test(a)) load(a); }
 
@@ -65,17 +65,19 @@ export function mountChip(host, { home = "" } = {}) {
   btn.onclick = () => open(pop.hidden);
   addEventListener("keydown", (e) => { if (e.key === "Escape") open(false); });
   addEventListener("pointerdown", (e) => { if (!host.contains(e.target)) open(false); });
-  const thumbs = (n) => S.cats.slice(0, n).map((c) => c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "<i></i>").join("");
+  const every = () => Object.values(S.all || {}).flat();
+  const thumbs = (n) => every().slice(0, n).map((c) => c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "<i></i>").join("");
   function render() {
     btn.innerHTML = S.status === "none" ? "<span>Your Prancers</span>"
       : S.status === "loading" ? `<span>${esc(who())}</span><small>…</small>`
-      : `<span class="th">${thumbs(3)}</span><span>${esc(who())}</span><small>${S.cats.length}</small>`;
+      : `<span class="th">${thumbs(3)}</span><span>${esc(who())}</span><small>${S.total || S.cats.length}</small>`;
     if (pop.hidden) return;
     if (S.status === "none") { pop.innerHTML = `<h4>Your Prancers</h4><p>Connect once and your cats show up everywhere here: traits, GIFs, Desk Prancers and the Parade.</p><div data-f></div>`; connectForm(pop.querySelector("[data-f]")); return; }
     pop.innerHTML = `<h4>${esc(who())}</h4><p class="me-addr">${esc(S.address)}</p>` +
       (S.status === "loading" ? "<p>Finding your cats…</p>" : S.status === "error" ? `<p>${esc(S.note)}</p>`
-        : S.cats.length ? `<div class="me-cats">${S.cats.map((c) => `<span title="#${c.n} · ${esc(c.name)}">${c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "<i></i>"}</span>`).join("")}</div><p>${S.cats.length} Prancer${S.cats.length > 1 ? "s" : ""}${home ? ` · <a href="${home}">open your studio</a>` : ""}</p>`
-        : `<p>No Prancers at this address yet. <a href="index.html#mint">Adopt one</a>.</p>`) +
+        : S.total ? `<div class="me-cats">${every().slice(0, 24).map((c) => `<span title="${esc(c.name)}">${c.thumb ? `<img src="${esc(c.thumb)}" alt="">` : "<i></i>"}</span>`).join("")}</div><p>${
+          [["prancers", "Prancers"], ["pads", "Pads"], ["pfp", "PFP"], ["ride", "Wild Ride"]].filter(([k]) => (S.all[k] || []).length).map(([k, l]) => `${l} ${S.all[k].length}`).join(" · ")} · <a href="${home || "index.html"}#yours">open your collection</a></p>`
+        : `<p>No Prancers at this address yet. <a href="index.html#prancers">Adopt one</a>.</p>`) +
       `<div class="me-row"><button class="btn ghost" type="button" data-o>Use another address</button><button class="btn ghost" type="button" data-x>Forget</button></div>`;
     pop.querySelector("[data-x]").onclick = () => { forget(); };
     pop.querySelector("[data-o]").onclick = () => { forget(); open(true); };

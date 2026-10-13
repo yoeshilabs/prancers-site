@@ -295,6 +295,16 @@
   footer { padding: 26px 0 40px; font: 12px var(--mono); color: var(--dim); }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
 
+  /* your collection */
+  .coll { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: start; margin-bottom: 8px; }
+  @media (max-width: 900px) { .coll { grid-template-columns: 1fr; } }
+  .collview { position: sticky; top: 84px; } .collmeta { margin-top: 16px; } .collmeta h3 { font: 700 22px var(--mono); margin: 10px 0 4px; }
+  .collgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; max-height: 640px; overflow-y: auto; padding: 2px; scrollbar-width: thin; }
+  .tok { display: grid; gap: 4px; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px; cursor: pointer; color: var(--ink); transition: border-color .15s, transform .15s; }
+  .tok:hover { transform: translateY(-2px); } .tok.on { border-color: var(--neon); box-shadow: 0 0 18px var(--neon-soft); }
+  .tok img, .tok .ph { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: #000; display: grid; place-items: center; font: 11px var(--mono); color: var(--dim); }
+  .tok .nm { font: 700 12px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .tok .cl { font: 11px var(--mono); color: var(--mute); }
+  .labtabs button small { margin-left: 8px; font: 700 11px var(--mono); opacity: .8; }
   /* the story */
   .tabs, .projbar .wrap, nav .links { scrollbar-width: none; } .tabs::-webkit-scrollbar, nav .links::-webkit-scrollbar { display: none; }
   .introgrid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
@@ -446,6 +456,17 @@
 <section id="yours" class="chapter"><div class="wrap">
   <div class="head"><div><div class="kicker" id="y-kick">Your Prancers</div><h2 id="y-title">Un-chain your cats.</h2></div>
     <p id="y-lede"></p></div>
+  <div class="coll" id="coll" hidden>
+    <div class="collview">
+      <div class="stage"><iframe id="coll-stage" title="The token you picked, live" allow="autoplay"></iframe><span class="tag">live · tap for sound</span></div>
+      <div class="collmeta"><div class="kicker" id="coll-kind"></div><h3 id="coll-name"></h3>
+        <div class="cta"><button class="btn" type="button" id="coll-gif">Make a GIF</button><a class="btn ghost" id="coll-objkt" target="_blank" rel="noopener">View on objkt</a></div></div>
+    </div>
+    <div class="collside"><div class="collhead"><span class="paneltitle">Your collection · <span id="coll-who"></span></span></div>
+      <div class="labtabs" id="coll-tabs" role="tablist" aria-label="Your collection"></div>
+      <div class="collgrid" id="coll-grid"></div></div>
+  </div>
+  <div class="paneltitle" style="margin:34px 0 12px">Prancers studio · traits, Desk Prancers and the Parade</div>
   <div class="yourtop">
     <div class="shelf" id="shelf" aria-label="Your Prancers"></div>
     <div class="card traits" id="card" aria-live="polite"></div>
@@ -786,6 +807,7 @@ async function edStatus(x, kt) { try {
 } catch (e) { /* offline: the box keeps saying Live */ } }
 const edAll = () => Object.entries(EDS).forEach(([x, kt]) => edStatus(x, kt)); edAll(); setInterval(edAll, 60000);
 </script>
+<script type="module" src="collection.js"></script>
 <script type="module">
 /* Your Prancers. me.js knows who you are (connect once, read-only, or paste an address; it's
    remembered on this browser). Pick a cat on the shelf and its trait card fills beside it; the

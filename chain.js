@@ -3,6 +3,10 @@
    site uses and checks its shape (seeds against the operation-hash pattern, images against a
    strict ipfs:// pattern). Text still goes through the page's esc() when it's shown. */
 export const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzkt.io/v1/";
+const KT0 = KT;
+/* the whole line-up, in drop order: [key, contract, label, generator on this site] */
+export const LINEUP = [["prancers", KT, "Prancers", "prancers.html"], ["pads", "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", "Prancer Pads", "pads.html"],
+  ["pfp", "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", "Prancer PFP", "pfp.html"], ["ride", "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", "Wild Ride", "ride.html"]];
 export const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/;
 const CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})((\/[A-Za-z0-9._-]+)*)$/;
 /* covers through Aleatory's own IPFS gateway */
@@ -13,7 +17,7 @@ const get = (u) => fetch(u, { signal: AbortSignal.timeout(10000) }).then((r) => 
    behind (objkt runs its own indexer, so it doesn't). For a token TzKT hasn't resolved yet, follow
    the contract's own token_metadata link and read the file. If IPFS is slow too, the seed is
    still on chain: it's the mint's operation hash, so the cat can be drawn anyway. */
-export async function freshMeta(ids) {
+export async function freshMeta(ids, KT = KT0) {
   const out = {}; if (!ids.length) return out;
   try {
     const keys = await get(`${API}contracts/${KT}/bigmaps/token_metadata/keys?${ids.length > 1 ? "key.in=" + ids.join(",") : "key=" + ids[0]}&select=key,value`);   // TzKT refuses key.in with one value
@@ -42,8 +46,8 @@ export function toCat(id, m = {}) {
   return { id: Number(id), n, name: full.replace(/^Prancers #\d+ · /, "") || `Prancer #${n}`, seed: SEED.test(m.aleaSeed || "") ? m.aleaSeed : "",
     thumb: ipfs(m.thumbnailUri || m.displayUri), temp: f.Temperament || "" };
 }
-async function fill(rows) {   // rows: [{ id, m }] with TzKT's metadata; fills the ones TzKT hasn't read yet
-  const late = rows.filter((r) => !(r.m && r.m.aleaSeed)), got = await freshMeta(late.map((r) => r.id));
+async function fill(rows, kt = KT0) {   // rows: [{ id, m }] with TzKT's metadata; fills the ones TzKT hasn't read yet
+  const late = rows.filter((r) => !(r.m && r.m.aleaSeed)), got = await freshMeta(late.map((r) => r.id), kt);
   for (const r of late) r.m = got[r.id] || r.m || {};
   return rows.map((r) => toCat(r.id, r.m));
 }
@@ -61,4 +65,16 @@ export async function tokenCat(id) {
 export async function randomCat() {
   const all = await get(`${API}tokens?contract=${KT}&metadata.aleaSeed.null=false&limit=1000&select=tokenId,metadata`);
   const t = all[Math.floor(Math.random() * all.length)]; return t ? toCat(t.tokenId, t.metadata) : null;
+}
+
+/* everything an address holds across the line-up, in one read: { prancers: [...], pads: [...], pfp: [...], ride: [...] },
+   each token as toCat() plus its collection key and contract */
+export async function allHoldings(address) {
+  const bal = await get(`${API}tokens/balances?account=${address}&token.contract.in=${LINEUP.map((l) => l[1]).join(",")}&balance.gt=0&limit=1000&select=token.contract.address,token.tokenId,token.metadata`);
+  const out = {};
+  await Promise.all(LINEUP.map(async ([k, kt, label]) => {
+    const rows = bal.filter((b) => b["token.contract.address"] === kt).map((b) => ({ id: b["token.tokenId"], m: b["token.metadata"] }));
+    const cats = rows.length ? await fill(rows, kt) : [];
+    out[k] = cats.map((c) => ({ ...c, coll: k, kt, name: c.name.replace(new RegExp("^" + label + " #\\d+ · "), "").replace(/^Prancer #/, label + " #") })).sort((a, b) => a.id - b.id); }));
+  return out;
 }
