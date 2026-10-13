@@ -311,7 +311,13 @@
   .facts { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
   .facts span { border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font: 600 12px var(--mono); color: var(--mute); }
   .facts b { color: var(--ink); }
-  .labgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .labgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 18px; }
+  .labgrid .gifout { border-radius: 22px; }
+  .labbar { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: end; font: 13px var(--mono); color: var(--mute); }
+  .labbar label { display: grid; gap: 6px; } .labbar .grow { flex: 1 1 320px; } .labbar .check { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; }
+  .labbar select, .labbar input[type=text] { background: var(--bg, #0e0a14); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 13px var(--mono); min-height: 44px; }
+  .labbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .paneltitle { font: 700 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 10px; }
   @media (max-width: 860px) { .labgrid { grid-template-columns: 1fr; } }
   .labopts { display: grid; gap: 12px; font: 13px var(--mono); color: var(--mute); margin: 14px 0; }
   .labopts select, .labopts input[type=text] { width: 100%; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 13px var(--mono); }
@@ -401,21 +407,19 @@
 <section id="lab" class="chapter"><div class="wrap">
   <div class="head"><div><div class="kicker">The Lab · for every cat</div><h2>Make a GIF of any Prancer.</h2></div>
     <p>Pick a collection, paste a mint hash (or roll a random one) and your cat is redrawn exactly, frame by frame, right here in your browser. Nothing is uploaded.</p></div>
+  <div class="card labbar">
+    <label>Collection <select id="lab-proj"><option value="prancers">Prancers</option><option value="pads">Prancer Pads</option><option value="pfp">Prancer PFP</option><option value="ride">Wild Ride</option></select></label>
+    <label class="grow">Mint hash (empty for a random cat) <input type="text" id="lab-seed" placeholder="oo… or paste an Aleatory / objkt link" autocomplete="off" spellcheck="false"></label>
+    <label>Size <select id="lab-size"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label>
+    <div class="labbtns"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show">Show this cat</button></div>
+    <label class="check"><input type="checkbox" id="lab-play" checked> show someone playing with it</label>
+    <div class="labbtns"><button class="btn" type="button" id="lab-go">Make GIF</button><a class="btn ghost" id="lab-a" download hidden>Download GIF</a></div>
+  </div>
+  <div class="gifbar" id="lab-barw" hidden><i id="lab-bar"></i></div>
+  <p class="lookup-note" id="lab-note" aria-live="polite" style="margin:12px 0 0"></p>
   <div class="labgrid">
-    <div class="stage"><iframe id="lab-stage" title="The cat you picked" allow="autoplay"></iframe><span class="tag" id="lab-tag">preview</span></div>
-    <div>
-      <div class="labopts">
-        <label>Collection <select id="lab-proj"><option value="prancers">Prancers</option><option value="pads">Prancer Pads</option><option value="ride">Wild Ride</option><option value="pfp">Prancer PFP</option></select></label>
-        <label>Mint hash (leave empty for a random cat) <input type="text" id="lab-seed" placeholder="oo… or paste an Aleatory / objkt link" autocomplete="off" spellcheck="false"></label>
-        <div class="row"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show">Show this cat</button></div>
-        <div class="row"><label><input type="checkbox" id="lab-play" checked> show someone playing with it</label>
-          <label>size <select id="lab-size"><option value="320">320 px</option><option value="400" selected>400 px</option><option value="560">560 px</option></select></label></div>
-      </div>
-      <div class="cta"><button class="btn" type="button" id="lab-go">Make GIF</button><a class="btn ghost" id="lab-a" download hidden>Download GIF</a></div>
-      <div class="gifbar" id="lab-barw" hidden><i id="lab-bar"></i></div>
-      <p class="lookup-note" id="lab-note" aria-live="polite" style="margin-top:10px"></p>
-      <div class="gifout" id="lab-out" style="margin-top:14px;max-width:420px"><p>Your GIF appears here.</p></div>
-    </div>
+    <div><div class="paneltitle">Live preview</div><div class="stage"><iframe id="lab-stage" title="The cat you picked" allow="autoplay"></iframe><span class="tag" id="lab-tag">preview</span></div></div>
+    <div><div class="paneltitle">Your GIF</div><div class="gifout" id="lab-out"><p>Your GIF appears here.</p></div></div>
   </div>
   <div class="labcards">
     <div class="card"><div class="kicker">Lab</div><h3 style="font:700 18px var(--mono);margin:10px 0">Desk Prancers</h3><p style="color:var(--mute)">Let your Prancers out to roam this page: they climb onto buttons, nap on cards and come when you call.</p><div class="cta"><a class="btn ghost" href="#yours">Open the studio</a></div></div>
