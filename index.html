@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-2VgyPMZfXYc10kbdf/3xqHYgd6Z6UUFeHfgY6StGgC4=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-kMpdHnB9UZmsfsrv4qyq3d/RoVuHVEhAkHHuZgBvQio=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -379,6 +379,7 @@
   .labbar label { display: grid; gap: 6px; } .labbar .grow { flex: 1 1 320px; } .labbar .check { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; }
   .labbar select, .labbar input[type=text] { background: var(--bg, #0e0a14); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 13px var(--mono); min-height: 44px; }
   .labbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sharerow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; } .sharerow[hidden] { display: none; }
   .paneltitle { font: 700 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 10px; }
   @media (max-width: 860px) { .labgrid { grid-template-columns: 1fr; } }
   .labopts { display: grid; gap: 12px; font: 13px var(--mono); color: var(--mute); margin: 14px 0; }
@@ -466,6 +467,7 @@
     <div class="labbtns"><button class="btn ghost" type="button" id="lab-roll">🎲 Random</button><button class="btn ghost" type="button" id="lab-show" hidden>Show</button></div>
     <label class="check"><input type="checkbox" id="lab-play" checked> show someone playing with it</label>
     <div class="labbtns"><button class="btn" type="button" id="lab-go">Make GIF</button><a class="btn ghost" id="lab-a" download hidden>Download GIF</a></div>
+    <div class="sharerow" id="lab-share" hidden><span class="paneltitle" style="margin:0">Share it</span><button class="btn ghost" type="button" id="lab-native">Share…</button><button class="btn ghost" type="button" id="lab-x">Post on X</button></div>
   </div>
   <div class="gifbar" id="lab-barw" hidden><i id="lab-bar"></i></div>
   <p class="lookup-note" id="lab-note" aria-live="polite" style="margin:12px 0 0"></p>
@@ -773,7 +775,7 @@ let labBusy = false;
 async function labGif() {
   if (labBusy) return; labBusy = true; const note = (t) => L$("lab-note").textContent = t, p = L$("lab-proj").value, play = L$("lab-play").checked;
   let seed = labSeed(); if (!seed) { seed = rndSeed(); L$("lab-seed").value = seed; }
-  L$("lab-go").disabled = true; L$("lab-a").hidden = true; L$("lab-barw").hidden = false; L$("lab-bar").style.width = "0";
+  L$("lab-go").disabled = true; L$("lab-a").hidden = true; L$("lab-share").hidden = true; L$("lab-barw").hidden = false; L$("lab-bar").style.width = "0";
   try {
     note("Drawing your cat…"); await loadGifLib();
     const size = +L$("lab-size").value, cv = document.createElement("canvas"); cv.width = cv.height = size; const cx = cv.getContext("2d");
@@ -823,6 +825,15 @@ async function labGif() {
     const url = URL.createObjectURL(blob), slug = (p + "-" + name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     L$("lab-out").innerHTML = ""; const im = new Image(); im.src = url; im.alt = name; L$("lab-out").appendChild(im);
     L$("lab-a").href = url; L$("lab-a").download = slug + ".gif"; L$("lab-a").hidden = false;
+    /* sharing: the device's share sheet with the GIF itself where it can, or a ready post on X (the GIF downloads to attach) */
+    const COLL = { prancers: "Prancers", pads: "Prancer Pads", pfp: "Prancer PFP", ride: "Wild Ride" }[p], file = new File([blob], slug + ".gif", { type: "image/gif" });
+    const text = `${name} from ${COLL}, alive on Tezos 🐾`, site = "https://yoeshilabs.github.io/prancers-site/";
+    const canFile = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+    L$("lab-native").hidden = !canFile && !navigator.share;
+    L$("lab-native").onclick = async () => { try { if (canFile) await navigator.share({ files: [file], title: name, text: text + " " + site }); else await navigator.share({ title: name, text, url: site }); } catch (e) { /* closed */ } };
+    L$("lab-x").onclick = () => { L$("lab-a").click(); open(`https://x.com/intent/post?text=${encodeURIComponent(text + "\n\n" + site)}`, "_blank", "noopener");
+      note(`${name} · the GIF downloaded: attach it to your post on X.`); };
+    L$("lab-share").hidden = false;
     const mb = blob.size / 1048576; note(`${name} · ${mb.toFixed(1)} MB` + (mb > 10 ? " · over Discord's 10 MB limit, so try a smaller size for Discord" : ""));
   } catch (err) { note(err.message || "Something went wrong making the GIF. Please try again."); }
   L$("lab-go").disabled = false; L$("lab-barw").hidden = true; labBusy = false;
