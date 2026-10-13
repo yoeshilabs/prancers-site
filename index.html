@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-Ve2PHmNAorpcYaeH86KImhwRXspPq70LE/T8Mc4GlNc=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-EbHeZZYNDmnROyqhf4R9yFRLhGt31HJ4gczq+6DbbG4=' 'sha256-2VgyPMZfXYc10kbdf/3xqHYgd6Z6UUFeHfgY6StGgC4=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers — cats that walk on the beat</title>
 <meta name="description" content="Prancers: a fully on-chain generative cat collection on Aleatory. Every cat walks on the beat, has a temperament, and sings its own theme song.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -787,14 +787,25 @@ async function labGif() {
       await new Promise((r) => { fr.onload = r; fr.src = `${GEN[p]}?seed=${encodeURIComponent(seed)}&vc=1`; }); W = fr.contentWindow; name = (W.$alea._features || {}).Name || ({ pads: "Prancer Pad", ride: "Wild Ride", pfp: "Prancer" })[p];
       const FPS = 12, N = FPS * (p === "pfp" ? 7 : 6), S = W.document.querySelector("svg"), C = 600;
       for (let k = 0; k < FPS * 1.5; k++) W.__pump(1 / FPS);                                              /* settle in */
-      /* the cursor's little performance (piece units): arrive, circle, stroke the head, tap, leave */
-      const at = (t) => t < 0.6 ? null : t < 2.4 ? { x: 500 + 300 * Math.cos(t * 2.2), y: 380 + 200 * Math.sin(t * 2.2) } : t < 4.4 ? { x: 500 + 90 * Math.sin(t * 16), y: 330 + 10 * Math.cos(t * 8) } : t < 6.2 ? { x: 640, y: 300 } : null;
-      const tapAt = p === "pads" ? [1.2, 3.4] : [4.8];
+      /* the cursor's little performance, made for each collection (in frame pixels, 600 across):
+         PFP: arrive, circle the head, stroke it, tap; Pads: visit a cat, tap it, linger, visit another (following
+         the real cats as they wander); Wild Ride: come over to the cat and its rider, tap for the band */
+      const U = C / 1000, ease = (u) => u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, mixP = (a, b, u) => ({ x: a.x + (b.x - a.x) * ease(Math.min(1, Math.max(0, u))), y: a.y + (b.y - a.y) * ease(Math.min(1, Math.max(0, u))) });
+      const catAt = (k) => { const cs = (W.__pads && W.__pads.cats) || []; const c = cs[k % Math.max(1, cs.length)]; if (!c || !c.root) return { x: 300, y: 330 };
+        const r = c.root.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height * 0.45 }; };
+      const OFF = { x: C * 1.1, y: C * 0.3 };
+      const PERF = {
+        pfp: { taps: [4.8], at: (t) => t < 0.6 ? null : t < 2.4 ? { x: (500 + 300 * Math.cos(t * 2.2)) * U, y: (380 + 200 * Math.sin(t * 2.2)) * U } : t < 4.4 ? { x: (500 + 90 * Math.sin(t * 16)) * U, y: (330 + 10 * Math.cos(t * 8)) * U } : t < 6.2 ? { x: 640 * U, y: 300 * U } : null },
+        pads: { taps: [1.6, 4.1], at: (t) => t < 0.5 ? null : t < 1.5 ? mixP(OFF, catAt(0), (t - 0.5) / 1) : t < 3.0 ? { x: catAt(0).x + 10 * Math.sin(t * 3), y: catAt(0).y } :
+          t < 4.0 ? mixP(catAt(0), catAt(1), (t - 3) / 1) : t < 5.4 ? catAt(1) : t < 6 ? mixP(catAt(1), OFF, (t - 5.4) / 0.6) : null },
+        ride: { taps: [1.8, 4.4], at: (t) => { const cat = { x: 470 * U, y: 560 * U }; return t < 0.5 ? null : t < 1.6 ? mixP(OFF, cat, (t - 0.5) / 1.1) : t < 5.6 ? { x: cat.x + 14 * Math.sin(t * 1.5), y: cat.y + 8 * Math.cos(t * 1.2) } : t < 6.2 ? mixP(cat, OFF, (t - 5.6) / 0.6) : null; } },
+      }[p];
       for (let i = 0; i < N; i++) frames.push(() => { const t = i / FPS; let cur = null;
-        if (play) { const q = at(t); if (q) { const x = q.x * C / 1000, y = q.y * C / 1000, o = { clientX: x, clientY: y, bubbles: true, pointerId: 1 };
-            S.dispatchEvent(new W.PointerEvent("pointerenter", o)); S.dispatchEvent(new W.PointerEvent("pointermove", o));
-            if (tapAt.some((k) => t >= k && t < k + 1 / FPS)) { S.dispatchEvent(new W.PointerEvent("pointerdown", o)); S.dispatchEvent(new W.PointerEvent("pointerup", o)); S.dispatchEvent(new W.MouseEvent("click", o)); }
-            cur = [q.x / 1000, q.y / 1000]; } else S.dispatchEvent(new W.PointerEvent("pointerleave", { bubbles: true })); }
+        if (play && PERF) { const q = PERF.at(t); if (q) { const o = { clientX: q.x, clientY: q.y, bubbles: true, pointerId: 1, view: W };
+            const el = W.document.elementFromPoint(q.x, q.y) || S;                                   /* events land on whatever is under the cursor, as a real pointer's do */
+            el.dispatchEvent(new W.PointerEvent("pointerenter", o)); el.dispatchEvent(new W.PointerEvent("pointermove", o)); el.dispatchEvent(new W.MouseEvent("mousemove", o));
+            if (PERF.taps.some((k) => t >= k && t < k + 1 / FPS)) { el.dispatchEvent(new W.PointerEvent("pointerdown", o)); el.dispatchEvent(new W.PointerEvent("pointerup", o)); el.dispatchEvent(new W.MouseEvent("click", o)); }
+            cur = [q.x / C, q.y / C]; } else S.dispatchEvent(new W.PointerEvent("pointerleave", { bubbles: true })); }
         W.__pump(1 / FPS); return cur; });
     }
     const svg = W.document.querySelector("svg"), gif = new GIF({ workers: 2, quality: 10, width: size, height: size, workerScript: gifLib, repeat: 0 }), FPSd = p === "prancers" ? 10 : 12;
