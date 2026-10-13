@@ -52,3 +52,11 @@ document.addEventListener("click", (e) => { const t = e.target.closest("[data-lp
     if (t.matches("[data-lp]") && mine.length) { seedIn.value = mine[0].seed; $("lab-show").click(); }   /* a new tab opens on your first cat there */
     fillLab(); }, 0); });
 addEventListener("me:change", fillLab); fillLab();
+
+/* not connected yet: one clean card to connect (or paste an address) */
+import("./me.js").then(({ connectForm }) => {
+  const box = $("coll-connect");
+  const show = () => { const S = me(); box.hidden = S.status === "ready" && S.total > 0 ? true : S.status === "loading" ? true : false;
+    if (!box.hidden && !box.dataset.on) { box.dataset.on = 1; box.innerHTML = `<h3>Connect once</h3><p class="small">Your cats from every project show up right here.</p><div data-f></div>`; connectForm(box.querySelector("[data-f]")); }
+    if (S.status === "ready" && !S.total) box.querySelector("h3").textContent = "No Prancers here yet"; };
+  addEventListener("me:change", show); show(); });
