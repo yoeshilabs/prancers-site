@@ -398,7 +398,7 @@
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
   <button class="menubtn" type="button" aria-expanded="false" aria-controls="navlinks" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="links" id="navlinks"><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">PFP</a><a href="#ride">Wild Ride</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
+  <div class="links" id="navlinks"><a href="/" title="Back to Maestro and the rest of Yoeshi Labs">Home</a><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">PFP</a><a href="#ride">Wild Ride</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
   <div id="me"></div>
 </div></nav>
 
@@ -1014,5 +1014,7 @@ addEventListener("me:change", () => {
 shelf();
 randomCat().then((c) => { if (!c || own().length || visitors.length) return; visitors.push({ ...c, visiting: true, auto: true }); pick(visitors[0]); }).catch(() => {});
 </script>
+<!-- Maestro follows visitors who came through one of his links, and waits in the corner (yoeshilabs.github.io/companion.js) -->
+<script src="/companion.js" data-wing="prancers" defer></script>
 </body>
 </html>
