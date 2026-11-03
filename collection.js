@@ -5,7 +5,7 @@ import { me, who } from "./me.js";
 import { LINEUP } from "./chain.js";
 const $ = (id) => document.getElementById(id), host = $("coll");
 const esc = (v) => String(v).replace(/[&<>"'`]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" })[c]);
-const LAB = { prancers: "Prancers", pads: "Prancer Pads", pfp: "Prancer PFP", ride: "Wild Ride" };
+const LAB = { prancers: "Prancers", pads: "Prancer Pads", pfp: "Prancer Portraits", ride: "Wild Ride" };
 let tab = "all", pick = null;
 const list = () => { const S = me(); return tab === "all" ? LINEUP.flatMap(([k]) => S.all[k] || []) : S.all[tab] || []; };
 function render() {

@@ -6,7 +6,7 @@ export const KT = "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", API = "https://api.tzk
 const KT0 = KT;
 /* the whole line-up, in drop order: [key, contract, label, generator on this site] */
 export const LINEUP = [["prancers", KT, "Prancers", "prancers.html"], ["pads", "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", "Prancer Pads", "pads.html"],
-  ["pfp", "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", "Prancer PFP", "pfp.html"], ["ride", "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", "Wild Ride", "ride.html"]];
+  ["pfp", "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", "Prancer Portraits", "pfp.html"], ["ride", "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", "Wild Ride", "ride.html"]];
 export const SEED = /^o[1-9A-HJ-NP-Za-km-z]{50}$/;
 const CID = /^ipfs:\/\/([A-Za-z0-9]{46,64})((\/[A-Za-z0-9._-]+)*)$/;
 /* covers through Aleatory's own IPFS gateway */
