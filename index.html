@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-/KE/frZNSeuAEaqUUmxvI0HQyZ+130F5UcZ9sVk1lwg=' 'sha256-XSMgJBIFWEd/nnNJN1SMKZIQ/2urk4qPUfOTkr2whIA=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-/KE/frZNSeuAEaqUUmxvI0HQyZ+130F5UcZ9sVk1lwg=' 'sha256-UiI+hM7x6W5ACQq4LJ5AvN6us8F2Jwh1V1wVht542og=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers: living cats, born on Tezos</title>
 <meta name="description" content="Welcome to the Prancer Purranchise! Living cats, born on Tezos: Prancers, Prancer Pads, Prancer Portraits, Wild Ride and Prancer Post. Pet them, play with them, make GIFs of your own. Fully on-chain.">
 <meta property="og:type" content="website"><meta property="og:url" content="https://yoeshilabs.github.io/prancers-site/"><meta property="og:site_name" content="Prancers">
@@ -81,6 +81,7 @@
   .stage { position: relative; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: #000;
     box-shadow: 0 0 0 1px var(--line), 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .12); }
   .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .stage > img.cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }   /* a chapter shown by its covers (Prancer 3D: the live piece is a 3D cat on Aleatory) */
   .stage .tag { position: absolute; left: 14px; top: 14px; padding: 6px 12px; border-radius: 999px; background: rgba(14, 10, 20, .7);
     font: 12px var(--mono); color: var(--mute); pointer-events: none; }
   .hero h1 { font-size: clamp(64px, 9vw, 112px); }
@@ -402,7 +403,7 @@
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
   <button class="menubtn" type="button" aria-expanded="false" aria-controls="navlinks" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="links" id="navlinks"><a href="/" title="Back to Yoeshi's home, Maestro and the rest of Yoeshi Labs">Home</a><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">Portraits</a><a href="#ride">Wild Ride</a><a href="#post">Prancer Post</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
+  <div class="links" id="navlinks"><a href="/" title="Back to Yoeshi's home, Maestro and the rest of Yoeshi Labs">Home</a><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">Portraits</a><a href="#ride">Wild Ride</a><a href="#post">Prancer Post</a><a href="#p3d">Prancer 3D</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
   <div id="me"></div>
 </div></nav>
 
@@ -473,6 +474,19 @@
     <div class="statline"><span><small>Edition</small><b id="post-edition">…</b></span><span><small>Price</small><b id="post-price">…</b></span><span><small>Status</small><b id="post-status">Live</b></span></div>
     <div class="progress" id="post-prog" hidden><div class="row"><b id="post-n"></b><span id="post-left"></span></div><div class="track"><i id="post-bar"></i></div></div>
     <div class="cta"><a class="btn" href="https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En" target="_blank" rel="noopener">Mint your street on Aleatory</a><a class="linkbtn" id="post-full" href="post.html" target="_blank" rel="noopener">Play this street full screen ↗</a></div>
+  </div>
+</div></section>
+
+<section id="p3d" class="chapter"><div class="wrap chap-grid">
+  <div class="stage"><img class="cover" src="media/prancer-3d.jpg" alt="Nine Prancer 3D cats: a caracal in the snow, a leopard chef, a cyber cat, a cat in the Sphere, a guitarist, a gladiator, a cat in a pink suit, a sword knight and a cyber violinist" loading="lazy"><span class="tag">Chapter 07 · 3D</span></div>
+  <div class="chap-text">
+    <div class="kicker" id="p3d-kicker">Chapter 07 · live on Aleatory</div>
+    <h2 class="ctitle neon">PRANCER 3D</h2>
+    <p class="lede"><strong>Then the Prancers stepped out of the frame.</strong> Every mint is a Prancer in full 3D, rolled from its own seed: its coat and fur, what it wears, an instrument or a treasure to hold, and a home from the Purranchise. Each one walks into The Purrancers' show with you.</p>
+    <p class="keys"><b>Tap the cat for its signature move.</b> Hold to pet · double tap to prance · tap the background for laser eyes · drag to walk round it</p>
+    <div class="statline" id="p3d-stats"><span><small>Edition</small><b id="p3d-edition">…</b></span><span><small>Price</small><b id="p3d-price">…</b></span><span><small>Status</small><b id="p3d-status">Live</b></span></div>
+    <div class="progress" id="p3d-prog" hidden><div class="row"><b id="p3d-n"></b><span id="p3d-left"></span></div><div class="track"><i id="p3d-bar"></i></div></div>
+    <div class="cta"><a class="btn" id="p3d-mint" href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener">Mint your Prancer 3D on Aleatory</a><a class="linkbtn" href="https://teztowers.com" target="_blank" rel="noopener">Walk into the show at TezTowers</a></div>
   </div>
 </div></section>
 
@@ -863,7 +877,7 @@ async function labGif() {
 L$("lab-go").onclick = labGif;
 /* each chapter's edition counter, from the chain (TzKT): edition, price, status and how many are minted; an
    edition size of 0 is an open edition */
-const EDS = { pads: "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", pfp: "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", ride: "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", post: "KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En" };
+const EDS = { pads: "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", pfp: "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", ride: "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", post: "KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En", p3d: "KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" };
 async function edStatus(x, kt) { try {
   const get = (q) => fetch("https://api.tzkt.io/v1/" + q).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
   const [sale, minted] = await Promise.all([get(`contracts/${kt}/storage?path=sale`), get(`tokens/count?contract=${kt}`)]);
