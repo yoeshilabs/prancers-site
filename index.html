@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-/KE/frZNSeuAEaqUUmxvI0HQyZ+130F5UcZ9sVk1lwg=' 'sha256-VTAvu6eAAyuEV0DBXCQGs3yPXuPkX6q38e5Arnqvj3w=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-/KE/frZNSeuAEaqUUmxvI0HQyZ+130F5UcZ9sVk1lwg=' 'sha256-qUPyalHy4ELumrntt+C/zR7IFuOxkiC+dOsR05gAzhA=' 'sha256-3hptNdwpKPlSH7d0vOAvGaJZxvfb3QeDfc5VZrFTfZw='; worker-src blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://ipfs.fileship.xyz https://gateway.pinata.cloud; connect-src 'self' https://api.tzkt.io https://api.tezos.domains https://cdnjs.cloudflare.com https://ipfs.fileship.xyz https://*.octez.io wss://*.octez.io https://*.walletconnect.org wss://*.walletconnect.org https://*.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://verify.walletconnect.org https://verify.walletconnect.com; object-src 'none'; base-uri 'self'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prancers: living cats, born on Tezos</title>
 <meta name="description" content="Welcome to the Prancer Purranchise! Living cats, born on Tezos: Prancers, Prancer Pads, Prancer Portraits, Wild Ride and Prancer Post. Pet them, play with them, make GIFs of your own. Fully on-chain.">
 <meta property="og:type" content="website"><meta property="og:url" content="https://yoeshi.art/prancers-site/"><meta property="og:site_name" content="Prancers">
@@ -891,16 +891,25 @@ L$("lab-go").onclick = labGif;
 /* each chapter's edition counter, from the chain (TzKT): edition, price, status and how many are minted; an
    edition size of 0 is an open edition */
 const EDS = { pads: "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", pfp: "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", ride: "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", post: "KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En", p3d: "KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" };
+/* The edition and price as the Codex has them (codex/facts.json; 0 is an open edition), shown at once: the chain's answer
+   replaces them when it comes. TzKT refuses a burst of lookups (429), which left a chapter's figures blank (Prancer 3D, asked
+   last, most often), so the chapters are asked one after another and one that is refused is asked again. */
+const KNOWN = { pads: [256, 10], pfp: [0, 1], ride: [1024, 6], post: [256, 4], p3d: [1056, 15] };
+for (const [x, [ed, tez]] of Object.entries(KNOWN)) { L$(x + "-edition").textContent = ed || "Open"; L$(x + "-price").textContent = tez + " ꜩ"; }
 async function edStatus(x, kt) { try {
   const get = (q) => fetch("https://api.tzkt.io/v1/" + q).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-  const [sale, minted] = await Promise.all([get(`contracts/${kt}/storage?path=sale`), get(`tokens/count?contract=${kt}`)]);
+  const sale = await get(`contracts/${kt}/storage?path=sale`), minted = await get(`tokens/count?contract=${kt}`);
   const ed = +sale.edition_size, open = !ed, left = open ? 0 : Math.max(0, ed - minted), sold = !open && left === 0;
   L$(x + "-edition").textContent = open ? "Open" : ed; L$(x + "-price").textContent = +sale.price / 1e6 + " ꜩ";
   L$(x + "-status").textContent = sold ? "Sold out" : sale.paused ? "Paused" : "Live";
   L$(x + "-n").textContent = open ? `${minted} minted` : `${minted} / ${ed} minted`; L$(x + "-left").textContent = open ? "open edition" : sold ? "Sold out" : `${left} left`;
-  L$(x + "-bar").style.width = open ? "100%" : (100 * minted / ed).toFixed(1) + "%"; L$(x + "-prog").hidden = false;
-} catch (e) { /* offline: the box keeps saying Live */ } }
-const edAll = () => Object.entries(EDS).forEach(([x, kt]) => edStatus(x, kt)); edAll(); setInterval(edAll, 60000);
+  L$(x + "-bar").style.width = open ? "100%" : (100 * minted / ed).toFixed(1) + "%"; L$(x + "-prog").hidden = false; return true;
+} catch (e) { return false; /* offline or refused: the box keeps the Codex's figures and says Live */ } }
+const edWait = (ms) => new Promise((r) => setTimeout(r, ms)); let edBusy = false;
+async function edAll() { if (edBusy) return; edBusy = true;
+  for (const [x, kt] of Object.entries(EDS)) { for (let i = 0; i < 3 && !(await edStatus(x, kt)); i++) await edWait(1500 * (i + 1)); await edWait(250); }
+  edBusy = false; }
+edAll(); setInterval(edAll, 60000);
 </script>
 <script type="module" src="collection.js"></script>
 <script type="module">
