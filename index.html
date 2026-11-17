@@ -81,7 +81,7 @@
   .stage { position: relative; aspect-ratio: 1; border-radius: 22px; overflow: hidden; background: #000;
     box-shadow: 0 0 0 1px var(--line), 0 30px 80px rgba(0, 0, 0, .55), 0 0 60px rgba(255, 95, 162, .12); }
   .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-  .stage > img.cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }   /* a chapter shown by its covers (Prancer 3D: the live piece is a 3D cat on Aleatory) */
+  .stage > img.cover, .stage > video.cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }   /* a chapter shown by its covers (Prancer 3D: the live piece is a 3D cat on Aleatory) */
   .stage .tag { position: absolute; left: 14px; top: 14px; padding: 6px 12px; border-radius: 999px; background: rgba(14, 10, 20, .7);
     font: 12px var(--mono); color: var(--mute); pointer-events: none; }
   .hero h1 { font-size: clamp(64px, 9vw, 112px); }
@@ -328,7 +328,8 @@
   .intro .lede { margin: 0; max-width: 62ch; }
   .sheetrow { padding: 0 0 88px; } .small2 { font-size: 17px; color: var(--mute); max-width: 40ch; }
 .keys { font: 13px/1.7 var(--mono); color: var(--mute); margin: 0 0 18px; }
-#post .stage .tag { left: auto; right: 14px; transition: opacity .4s; }   /* the game's score card lives top left */
+#post .stage .tag { left: auto; right: 14px; transition: opacity .4s; }
+#park .stage .tag { top: auto; bottom: 14px; }   /* the plane tows its banner across the top of the picture */   /* the game's score card lives top left */
 #post .stage.riding .tag { opacity: 0; }
 .keys b { color: var(--ink); }
   .subhead { font: 700 18px var(--mono); margin: 48px 0 14px; }
@@ -403,7 +404,7 @@
 <nav><div class="wrap">
   <a class="brand neon" href="#top">PRANCERS</a>
   <button class="menubtn" type="button" aria-expanded="false" aria-controls="navlinks" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="links" id="navlinks"><a href="/" title="Back to Yoeshi's home, Maestro and the rest of Yoeshi Labs">Home</a><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">Portraits</a><a href="#ride">Wild Ride</a><a href="#post">Prancer Post</a><a href="#p3d">Prancer 3D</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
+  <div class="links" id="navlinks"><a href="/" title="Back to Yoeshi's home, Maestro and the rest of Yoeshi Labs">Home</a><a href="#prancers">Prancers</a><a href="#pads">Pads</a><a href="#pfp">Portraits</a><a href="#ride">Wild Ride</a><a href="#post">Prancer Post</a><a href="#p3d">Prancer 3D</a><a href="#park">Prancer Park</a><a href="#lab">Lab</a><a href="#yours" class="mob">Desk Prancers</a></div>
   <div id="me"></div>
 </div></nav>
 
@@ -487,6 +488,18 @@
     <div class="statline" id="p3d-stats"><span><small>Edition</small><b id="p3d-edition">…</b></span><span><small>Price</small><b id="p3d-price">…</b></span><span><small>Status</small><b id="p3d-status">Live</b></span></div>
     <div class="progress" id="p3d-prog" hidden><div class="row"><b id="p3d-n"></b><span id="p3d-left"></span></div><div class="track"><i id="p3d-bar"></i></div></div>
     <div class="cta"><a class="btn" id="p3d-mint" href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener">Mint your Prancer 3D on Aleatory</a><a class="linkbtn" href="https://teztowers.com" target="_blank" rel="noopener">Walk into the show at TezTowers</a></div>
+  </div>
+</div></section>
+
+<section id="park" class="chapter"><div class="wrap chap-grid">
+  <div class="stage"><video class="cover" src="media/prancer-park.mp4" poster="media/prancer-park.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Prancer Park at dusk: The Purrancers playing in The Pawvilion, a pink bandstand, with a crowd of Prancers on the lawn, the PRANCERS gate in front and the Lounge, the Sphere, Yoeshi Labs, the Pads and the Post up the hill behind"></video><span class="tag">Chapter 08 · 1/1</span></div>
+  <div class="chap-text">
+    <div class="kicker">Chapter 08 · a 1/1 on objkt</div>
+    <h2 class="ctitle neon">PRANCER PARK</h2>
+    <p class="lede"><strong>Then the world got a map.</strong> The Purrancers are playing The Pawvilion, the new outdoor venue in a growing world of musical cats. Behind them is the rest of that world so far, and this composition became the first design for its game map.</p>
+    <p class="keys"><b>Made for #200tez.</b> A ten second loop, built in code · an access pass to future token-gated experiences by Yoeshi Labs and The Purrancers</p>
+    <div class="statline"><span><small>Edition</small><b>1/1</b></span><span><small>Minted</small><b>17 Nov 2026</b></span><span><small>Where</small><b>objkt</b></span></div>
+    <div class="cta"><a class="btn" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/6" target="_blank" rel="noopener">See Prancer Park on objkt</a><a class="linkbtn" href="/lounge/">Walk into the Lounge</a></div>
   </div>
 </div></section>
 
